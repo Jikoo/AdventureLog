@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
@@ -63,9 +64,12 @@ public class AdventureLogPlugin extends JavaPlugin {
 		addTabExecutor("locklogwaypoint", executor);
 
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> getServer().getOnlinePlayers().forEach(player -> {
-			if (player.getInventory().contains(getWaypointBook())) {
+			if ((player.getGameMode() != GameMode.SURVIVAL && player.getGameMode() != GameMode.ADVENTURE)
+					|| !player.getInventory().contains(getWaypointBook())) {
+				// Require survival/adventure and waypoint book in inventory to discover waypoints
 				return;
 			}
+
 			getDataStore().getWaypoints().stream().filter(waypoint ->
 					getDataStore().getDefaultWaypoints().stream().noneMatch(waypoint::equals)
 							&& getDataStore().getWaypoints(player.getUniqueId()).stream().noneMatch(waypoint::equals))
