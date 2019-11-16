@@ -10,11 +10,15 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,8 +70,8 @@ public class SimpleUI implements InventoryHolder {
 	public @NotNull
 	Inventory getInventory() {
 		int highestIndex = buttons.size() > 0 ? buttons.lastKey() : 0;
-		int requiredSize = Math.max(54, Math.max(9, (int) Math.ceil(highestIndex / 9D) * 9));
-		Inventory inventory = Bukkit.createInventory(this, requiredSize > 54 ? 54 : requiredSize, name);
+		int size = Math.min(54, Math.max(9, (int) Math.ceil(highestIndex / 9D) * 9));
+		Inventory inventory = Bukkit.createInventory(this, size, name);
 		draw(inventory);
 		return inventory;
 	}
@@ -87,7 +91,15 @@ public class SimpleUI implements InventoryHolder {
 				ItemStack itemStack;
 				Consumer<InventoryClickEvent> consumer;
 				if (startIndex > 0) {
-					itemStack = new ItemStack(Material.SPECTRAL_ARROW);
+					itemStack = new ItemStack(Material.BLACK_BANNER);
+					ItemMeta itemMeta = itemStack.getItemMeta();
+					if (itemMeta instanceof BannerMeta) {
+						BannerMeta bannerMeta = (BannerMeta) itemMeta;
+						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT));
+						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT_MIRROR));
+						bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_LEFT));
+						itemStack.setItemMeta(itemMeta);
+					}
 					consumer = event -> {
 						startIndex = 0;
 						draw(event.getView().getTopInventory());
@@ -111,8 +123,13 @@ public class SimpleUI implements InventoryHolder {
 				int maxPage = (int) Math.ceil(getHighestButton() / 45D);
 				ItemStack itemStack;
 				if (startIndex > 0) {
-					itemStack = new ItemStack(Material.ARROW);
+					itemStack = new ItemStack(Material.BLACK_BANNER);
 					ItemMeta itemMeta = itemStack.getItemMeta();
+					if (itemMeta instanceof BannerMeta) {
+						BannerMeta bannerMeta = (BannerMeta) itemMeta;
+						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT));
+						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT_MIRROR));
+					}
 					if (itemMeta != null) {
 						itemMeta.setDisplayName(ChatColor.WHITE + "Previous Page");
 						itemMeta.setLore(Collections.singletonList(ChatColor.GOLD + "  " + (startIndex / 45) + '/' + maxPage));
@@ -141,8 +158,13 @@ public class SimpleUI implements InventoryHolder {
 				int maxPage = (int) Math.ceil(highestRequiredButton / 45D);
 				ItemStack itemStack;
 				if (highestCurrentButton > highestRequiredButton) {
-					itemStack = new ItemStack(Material.ARROW);
+					itemStack = new ItemStack(Material.BLACK_BANNER);
 					ItemMeta itemMeta = itemStack.getItemMeta();
+					if (itemMeta instanceof BannerMeta) {
+						BannerMeta bannerMeta = (BannerMeta) itemMeta;
+						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT));
+						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT_MIRROR));
+					}
 					if (itemMeta != null) {
 						itemMeta.setDisplayName(ChatColor.WHITE + "Next Page");
 						itemMeta.setLore(Collections.singletonList(ChatColor.GOLD + "  " + (startIndex / 45 + 2) + '/' + maxPage));
@@ -170,15 +192,22 @@ public class SimpleUI implements InventoryHolder {
 				ItemStack itemStack;
 				Consumer<InventoryClickEvent> consumer;
 				if (startIndex > 0) {
-					itemStack = new ItemStack(Material.SPECTRAL_ARROW);
+					itemStack = new ItemStack(Material.BLACK_BANNER);
+					ItemMeta itemMeta = itemStack.getItemMeta();
+					if (itemMeta instanceof BannerMeta) {
+						BannerMeta bannerMeta = (BannerMeta) itemMeta;
+						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT));
+						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT_MIRROR));
+						bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_RIGHT));
+						itemStack.setItemMeta(itemMeta);
+					}
 					consumer = event -> {
 						startIndex = 45 * maxPage - 45;
 						draw(event.getView().getTopInventory());
 					};
 				} else {
 					itemStack = new ItemStack(Material.BARRIER);
-					consumer = event -> {
-					};
+					consumer = event -> {};
 				}
 				ItemMeta itemMeta = itemStack.getItemMeta();
 				if (itemMeta != null) {
