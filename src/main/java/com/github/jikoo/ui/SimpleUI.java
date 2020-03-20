@@ -63,7 +63,7 @@ public class SimpleUI implements InventoryHolder {
 	}
 
 	public int getHighestButton() {
-		return buttons.size() > 0 ? buttons.lastKey() : 0;
+		return buttons.size() > 0 ? buttons.lastKey() : -1;
 	}
 
 	@Override
