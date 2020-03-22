@@ -3,7 +3,7 @@ main: com.github.jikoo.AdventureLogPlugin
 version: ${project.version}
 author: Jikoo
 description: Exploration-based waypoints!
-api-version: "1.14"
+api-version: "1.15"
 
 permissions:
   adventurelog.*:
@@ -11,12 +11,9 @@ permissions:
     children:
       adventurelog.givelog: true
       adventurelog.givelog.other: true
-      adventurelog.addwaypoint: true
-      adventurelog.removewaypoint: true
       adventurelog.unlockwaypoint: true
       adventurelog.lockwaypoint: true
-      adventurelog.adddefaultwaypoint: true
-      adventurelog.removedefaultwaypoint: true
+      adventurelog.managewaypoints: true
 
 
 commands:
@@ -24,16 +21,11 @@ commands:
     description: Give a user an Adventure Log.
     usage: /givelog [player]
     permission: adventurelog.givelog
-  addlogwaypoint:
-    aliases: [addwaypoint, waypoint]
-    description: Add a new Adventure Log waypoint
-    usage: /addlogwaypoint <name> [priority] [default]
-    permission: adventurelog.addwaypoint
-  removelogwaypoint:
-    aliases: [removewaypoint, dellogwaypoint, delwaypoint]
-    description: Remove an Adventure Log waypoint
-    usage: /removelogwaypoint <name>
-    permission: adventurelog.removewaypoint
+  managewaypoints:
+    aliases: [editwaypoints]
+    description: Manage Adventure Log waypoints
+    usage: /<command>
+    permission: adventurelog.managewaypoints
   unlocklogwaypoint:
     aliases: [unlockwaypoint]
     description: Unlock a new Adventure Log waypoint
@@ -44,13 +36,3 @@ commands:
     description: Lock an Adventure Log waypoint
     usage: /locklogwaypoint <player> <name>
     permission: adventurelog.lockwaypoint
-  adddefaultlogwaypoint:
-    aliases: [adddefaultwaypoint, defaultwaypoint]
-    description: Add an Adventure Log waypoint to the default list
-    usage: /adddefaultlogwaypoint <name>
-    permission: adventurelog.adddefaultwaypoint
-  removedefaultlogwaypoint:
-    aliases: [removedefaultwaypoint, deldefaultlogwaypoint, deldefaultwaypoint]
-    description: Remove an Adventure Log waypoint from the default list
-    usage: /removedefaultlogwaypoint <name>
-    permission: adventurelog.removedefaultwaypoint

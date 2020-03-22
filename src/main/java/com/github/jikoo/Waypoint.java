@@ -9,31 +9,58 @@ import org.jetbrains.annotations.NotNull;
 public class Waypoint {
 
 	private final String name;
-	private final Location location;
-	private final ItemStack icon;
-	private final int priority;
+	private Location location;
+	private ItemStack icon;
+	private int priority;
+	private int rangeSquared;
 
-	private Waypoint(@NotNull String name, @NotNull Location location, @NotNull ItemStack icon, int priority) {
+	private Waypoint(@NotNull String name, @NotNull Location location, @NotNull ItemStack icon, int priority,
+			int rangeSquared) {
 		this.name = name;
 		this.location = location;
 		this.icon = icon;
 		this.priority = priority;
+		this.rangeSquared = rangeSquared;
 	}
 
-	public @NotNull String getName() {
+	@NotNull
+	public String getName() {
 		return name;
 	}
 
+	@NotNull
 	public Location getLocation() {
 		return location;
 	}
 
-	public @NotNull ItemStack getIcon() {
+	public void setLocation(@NotNull Location location) {
+		Objects.requireNonNull(location.getWorld(), "Waypoint world must be set!");
+		this.location = location;
+	}
+
+	@NotNull
+	public ItemStack getIcon() {
 		return icon;
+	}
+
+	public void setIcon(@NotNull ItemStack icon) {
+		this.icon = icon;
 	}
 
 	public int getPriority() {
 		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	public int getRangeSquared() {
+		return rangeSquared;
+	}
+
+	public void setRange(int range) {
+		this.rangeSquared = range < 1 ? -1 : range * range;
 	}
 
 	public static class Builder {
@@ -41,6 +68,7 @@ public class Waypoint {
 		private Location location;
 		private ItemStack icon;
 		private int priority;
+		private int rangeSquared;
 
 		public Builder(@NotNull String name) {
 			this.name = name;
@@ -64,11 +92,21 @@ public class Waypoint {
 			return this;
 		}
 
+		public Builder setRangeSquared(int rangeSquared) {
+			this.rangeSquared = rangeSquared;
+			return this;
+		}
+
+		public Builder setRange(int range) {
+			this.rangeSquared = range < 1 ? -1 : range * range;
+			return this;
+		}
+
 		public Waypoint build() {
 			Objects.requireNonNull(location, "Waypoint must have a location set!");
 			Objects.requireNonNull(location.getWorld(), "Waypoint world must be set!");
 			Objects.requireNonNull(icon, "Inventory representation must not be null!");
-			return new Waypoint(name, location, icon, priority);
+			return new Waypoint(name, location, icon, priority, rangeSquared);
 		}
 	}
 
@@ -86,7 +124,8 @@ public class Waypoint {
 			return false;
 		}
 		Waypoint other = (Waypoint) obj;
-		return name.equals(other.name) && location.equals(other.location) && icon.isSimilar(other.icon) && priority == other.priority;
+		return name.equals(other.name) && location.equals(other.location) && icon.isSimilar(other.icon)
+				&& priority == other.priority && rangeSquared == other.rangeSquared;
 	}
 
 }

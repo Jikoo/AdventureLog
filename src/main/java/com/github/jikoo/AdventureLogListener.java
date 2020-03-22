@@ -2,8 +2,10 @@ package com.github.jikoo;
 
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
@@ -29,17 +31,23 @@ public class AdventureLogListener implements Listener {
 		this.plugin = plugin;
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onInventoryClick(InventoryClickEvent event) {
 		if (!(event.getView().getTopInventory().getHolder() instanceof SimpleUI)) {
 			return;
 		}
+
 		int slot = event.getRawSlot();
-		event.setCancelled(true);
-		if (slot < 0 || event.getView().convertSlot(slot) != slot) {
+
+		if (slot < 0 || slot >= event.getView().getTopInventory().getSize()) {
 			// Click not in top inventory
+			if (((SimpleUI) event.getView().getTopInventory().getHolder()).isActionBlocking()) {
+				event.setCancelled(true);
+			}
 			return;
 		}
+
+		event.setCancelled(true);
 
 		((SimpleUI) event.getView().getTopInventory().getHolder()).handleClick(event);
 	}
@@ -75,7 +83,12 @@ public class AdventureLogListener implements Listener {
 				if (!(inventoryClickEvent.getWhoClicked() instanceof Player)) {
 					return;
 				}
-				new DelayedTeleport((Player) inventoryClickEvent.getWhoClicked(), waypoint.getLocation(), 3)
+				Player player = (Player) inventoryClickEvent.getWhoClicked();
+				if (!waypoint.getLocation().isWorldLoaded()) {
+					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("World not loaded!", ChatColor.RED));
+					return;
+				}
+				new DelayedTeleport(player, waypoint.getLocation(), 3)
 						.runTaskTimer(plugin, 0L, 2L);
 			});
 			ui.addButton(button);

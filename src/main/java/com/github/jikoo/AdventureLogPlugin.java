@@ -1,10 +1,8 @@
 package com.github.jikoo;
 
-import com.github.jikoo.commands.AddWaypointCommand;
 import com.github.jikoo.commands.GiveLogCommand;
-import com.github.jikoo.commands.ManageDefaultWaypointsCommand;
 import com.github.jikoo.commands.ManageUnlockedWaypointsCommand;
-import com.github.jikoo.commands.RemoveWaypointCommand;
+import com.github.jikoo.commands.ManageWaypointsCommand;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Objects;
@@ -53,15 +51,11 @@ public class AdventureLogPlugin extends JavaPlugin {
 
 		getServer().getPluginManager().registerEvents(new AdventureLogListener(this), this);
 
-		addTabExecutor("givelog", new GiveLogCommand(this));
-		addTabExecutor("addlogwaypoint", new AddWaypointCommand(this));
-		addTabExecutor("removelogwaypoint", new RemoveWaypointCommand(this));
-		TabExecutor executor = new ManageDefaultWaypointsCommand(this);
-		addTabExecutor("adddefaultlogwaypoint", executor);
-		addTabExecutor("removedefaultlogwaypoint", executor);
-		executor = new ManageUnlockedWaypointsCommand(this);
-		addTabExecutor("unlocklogwaypoint", executor);
-		addTabExecutor("locklogwaypoint", executor);
+		addExecutor("givelog", new GiveLogCommand(this));
+		addExecutor("managewaypoints", new ManageWaypointsCommand(this));
+		TabExecutor executor = new ManageUnlockedWaypointsCommand(this);
+		addExecutor("unlocklogwaypoint", executor);
+		addExecutor("locklogwaypoint", executor);
 
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> getServer().getOnlinePlayers().forEach(player -> {
 			if ((player.getGameMode() != GameMode.SURVIVAL && player.getGameMode() != GameMode.ADVENTURE)
@@ -74,8 +68,8 @@ public class AdventureLogPlugin extends JavaPlugin {
 					getDataStore().getDefaultWaypoints().stream().noneMatch(waypoint::equals)
 							&& getDataStore().getWaypoints(player.getUniqueId()).stream().noneMatch(waypoint::equals))
 					.forEach(waypoint -> {
-						if (player.getWorld().equals(waypoint.getLocation().getWorld())
-								&& player.getLocation().distanceSquared(waypoint.getLocation()) <= 900
+						if (waypoint.getRangeSquared() > -1 && player.getWorld().equals(waypoint.getLocation().getWorld())
+								&& player.getLocation().distanceSquared(waypoint.getLocation()) <= waypoint.getRangeSquared()
 								&& getDataStore().unlockWaypoint(player.getUniqueId(), waypoint.getName()) == DataStore.Result.SUCCESS) {
 							player.sendTitle("Waypoint discovered!", "Check your Adventure Log.", 10, 50, 20);
 						}
@@ -84,7 +78,7 @@ public class AdventureLogPlugin extends JavaPlugin {
 		), 60L, 60L);
 	}
 
-	private void addTabExecutor(String command, TabExecutor tabExecutor) {
+	private void addExecutor(String command, TabExecutor tabExecutor) {
 		PluginCommand pluginCommand = getCommand(command);
 
 		if (pluginCommand == null) {
@@ -92,7 +86,6 @@ public class AdventureLogPlugin extends JavaPlugin {
 		}
 
 		pluginCommand.setExecutor(tabExecutor);
-		pluginCommand.setTabCompleter(tabExecutor);
 	}
 
 	@Override

@@ -9,11 +9,16 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.bukkit.Location;
@@ -29,6 +34,7 @@ public class DataStore {
 	private static final String WAYPOINT_LOCATION = "waypoints.%s.location";
 	private static final String WAYPOINT_ICON = "waypoints.%s.icon";
 	private static final String WAYPOINT_PRIORITY = "waypoints.%s.priority";
+	private static final String WAYPOINT_RANGE_SQUARED = "waypoints.%s.range_squared";
 
 	public enum Result {
 		SUCCESS,
@@ -38,7 +44,8 @@ public class DataStore {
 
 	private final AdventureLogPlugin plugin;
 	private final LoadingCache<UUID, YamlConfiguration> playerCache;
-	private YamlConfiguration waypoints;
+	private Map<String, Waypoint> loadedWaypoints;
+	private Set<String> defaultWaypoints;
 
 	DataStore(AdventureLogPlugin plugin) {
 		this.plugin = plugin;
@@ -68,17 +75,50 @@ public class DataStore {
 	}
 
 	private void reloadWaypoints() {
-		this.waypoints = YamlConfiguration.loadConfiguration(getWaypointsFile());
+		loadedWaypoints = new HashMap<>();
+		defaultWaypoints = new HashSet<>();
+		YamlConfiguration waypointStorage = YamlConfiguration.loadConfiguration(getWaypointsFile());
+		if (!waypointStorage.isConfigurationSection("waypoints")) {
+			return;
+		}
+		ConfigurationSection waypointSection = waypointStorage.getConfigurationSection("waypoints");
+		if (waypointSection == null) {
+			return;
+		}
+		loadedWaypoints = waypointSection.getKeys(false).stream().map(waypointName -> loadWaypoint(waypointStorage, waypointName))
+				.filter(Objects::nonNull).distinct()
+				.collect(Collectors.toMap(Waypoint::getName, Function.identity(), (oldWaypoint, newWaypoint) -> newWaypoint, () -> loadedWaypoints));
+		defaultWaypoints.addAll(waypointStorage.getStringList("defaults"));
 	}
 
-	void save() {
-		try {
-			this.waypoints.save(getWaypointsFile());
-		} catch (IOException e) {
-			e.printStackTrace();
+	private Waypoint loadWaypoint(YamlConfiguration storage, String waypointName) {
+		Location location = storage.getSerializable(String.format(WAYPOINT_LOCATION, waypointName), Location.class);
+		ItemStack icon = storage.getSerializable(String.format(WAYPOINT_ICON, waypointName), ItemStack.class);
+		if (icon == null || icon.getType() == Material.AIR || location == null) {
+			return null;
 		}
+		return new Waypoint.Builder(waypointName).setIcon(icon).setLocation(location)
+				.setPriority(storage.getInt(String.format(WAYPOINT_PRIORITY, waypointName), 0))
+				.setRangeSquared(storage.getInt(String.format(WAYPOINT_RANGE_SQUARED, waypointName), 900)).build();
+	}
+
+	Result save() {
 		this.playerCache.invalidateAll();
 		this.playerCache.cleanUp();
+		YamlConfiguration storage = new YamlConfiguration();
+		for (Waypoint waypoint : loadedWaypoints.values()) {
+			storage.set(String.format(WAYPOINT_LOCATION, waypoint.getName()), waypoint.getLocation());
+			storage.set(String.format(WAYPOINT_ICON, waypoint.getName()), waypoint.getIcon());
+			storage.set(String.format(WAYPOINT_PRIORITY, waypoint.getName()), waypoint.getPriority());
+			storage.set(String.format(WAYPOINT_RANGE_SQUARED, waypoint.getName()), waypoint.getRangeSquared());
+		}
+		try {
+			storage.save(getWaypointsFile());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Result.FAILURE;
+		}
+		return Result.SUCCESS;
 	}
 
 	/**
@@ -92,16 +132,8 @@ public class DataStore {
 		if (waypoint.equals(existing)) {
 			return Result.UNNECESSARY;
 		}
-		this.waypoints.set(String.format(WAYPOINT_LOCATION, waypoint.getName()), waypoint.getLocation());
-		this.waypoints.set(String.format(WAYPOINT_ICON, waypoint.getName()), waypoint.getIcon());
-		this.waypoints.set(String.format(WAYPOINT_PRIORITY, waypoint.getName()), waypoint.getPriority());
-		try {
-			this.waypoints.save(getWaypointsFile());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Result.FAILURE;
-		}
-		return Result.SUCCESS;
+		this.loadedWaypoints.put(waypoint.getName(), waypoint);
+		return save(); // TODO better saving
 	}
 
 	/**
@@ -111,16 +143,12 @@ public class DataStore {
 	 * @return the Result of the operation
 	 */
 	public Result removeWaypoint(@NotNull String waypointName) {
-		this.waypoints.set(String.format(WAYPOINT_LOCATION, waypointName), null);
-		this.waypoints.set(String.format(WAYPOINT_ICON, waypointName), null);
-		this.waypoints.set(String.format(WAYPOINT_PRIORITY, waypointName), null);
-		try {
-			this.waypoints.save(getWaypointsFile());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Result.FAILURE;
+		Result removeDefault = removeDefault(waypointName);
+		if (this.loadedWaypoints.remove(waypointName) == null) {
+			return Result.SUCCESS;
+			// TODO better saving
 		}
-		return Result.SUCCESS;
+		return removeDefault;
 	}
 
 	/**
@@ -130,13 +158,7 @@ public class DataStore {
 	 * @return the Waypoint if it exists
 	 */
 	public @Nullable Waypoint getWaypoint(@NotNull String waypointName) {
-		Location location = this.waypoints.getSerializable(String.format(WAYPOINT_LOCATION, waypointName), Location.class);
-		ItemStack icon = this.waypoints.getSerializable(String.format(WAYPOINT_ICON, waypointName), ItemStack.class);
-		if (icon == null || icon.getType() == Material.AIR || location == null) {
-			return null;
-		}
-		return new Waypoint.Builder(waypointName).setIcon(icon).setLocation(location)
-				.setPriority(waypoints.getInt(String.format(WAYPOINT_PRIORITY, waypointName), 0)).build();
+		return loadedWaypoints.get(waypointName);
 	}
 
 	/**
@@ -149,19 +171,11 @@ public class DataStore {
 		if (getWaypoint(waypointName) == null) {
 			return Result.FAILURE;
 		}
-		List<String> defaults = waypoints.getStringList("defaults");
-		if (defaults.contains(waypointName)) {
-			return Result.UNNECESSARY;
+		if (defaultWaypoints.add(waypointName)) {
+			return Result.SUCCESS;
+			// TODO better saving
 		}
-		defaults.add(waypointName);
-		waypoints.set("defaults", defaults);
-		try {
-			this.waypoints.save(getWaypointsFile());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Result.FAILURE;
-		}
-		return Result.SUCCESS;
+		return Result.UNNECESSARY;
 	}
 
 	/**
@@ -171,18 +185,21 @@ public class DataStore {
 	 * @return the Result of the operation
 	 */
 	public Result removeDefault(@NotNull String waypointName) {
-		List<String> defaults = waypoints.getStringList("defaults");
-		if (!defaults.remove(waypointName)) {
-			return Result.UNNECESSARY;
+		if (this.defaultWaypoints.remove(waypointName)) {
+			// TODO better saving
+			return Result.SUCCESS;
 		}
-		waypoints.set("defaults", defaults);
-		try {
-			this.waypoints.save(getWaypointsFile());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Result.FAILURE;
-		}
-		return Result.SUCCESS;
+		return Result.UNNECESSARY;
+	}
+
+	/**
+	 * Check if a waypoint is discovered by default.
+	 *
+	 * @param waypoint the waypoint
+	 * @return true if the waypoint is discovered by default
+	 */
+	public boolean isDefault(@NotNull Waypoint waypoint) {
+		return this.defaultWaypoints.contains(waypoint.getName());
 	}
 
 	/**
@@ -192,8 +209,8 @@ public class DataStore {
 	 */
 	@NotNull
 	public Collection<Waypoint> getDefaultWaypoints() {
-		return waypoints.getStringList("defaults").stream().map(this::getWaypoint).filter(Objects::nonNull)
-				.distinct().sorted(Comparator.comparing(Waypoint::getPriority).reversed()).collect(Collectors.toList());
+		return defaultWaypoints.stream().map(this::getWaypoint).filter(Objects::nonNull)
+				.sorted(Comparator.comparing(Waypoint::getPriority).reversed()).collect(Collectors.toList());
 	}
 
 	/**
@@ -203,15 +220,7 @@ public class DataStore {
 	 */
 	@NotNull
 	public Collection<Waypoint> getWaypoints() {
-		if (!this.waypoints.isConfigurationSection("waypoints")) {
-			return Collections.emptyList();
-		}
-		ConfigurationSection waypointSection = this.waypoints.getConfigurationSection("waypoints");
-		if (waypointSection == null) {
-			return Collections.emptyList();
-		}
-		return waypointSection.getKeys(false).stream().map(this::getWaypoint).filter(Objects::nonNull)
-				.distinct().sorted(Comparator.comparing(Waypoint::getPriority).reversed()).collect(Collectors.toList());
+		return loadedWaypoints.values().stream().sorted(Comparator.comparing(Waypoint::getPriority).reversed()).collect(Collectors.toList());
 	}
 
 	/**

@@ -21,36 +21,53 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SimpleUI implements InventoryHolder {
 
-	private String name;
+	private final String name;
+	private final boolean actionBlocking;
 	private final TreeMap<Integer, Button> buttons = new TreeMap<>();
 	private final Map<Integer, Button> navigation = new HashMap<>();
 	private int startIndex = 0;
 
-	public SimpleUI(String name) {
-		this.name = name;
+	public SimpleUI(@NotNull String name) {
+		this(name, true);
 	}
 
-	public void handleClick(InventoryClickEvent event) {
+	public SimpleUI(@NotNull String name, boolean actionBlocking) {
+		this.name = name;
+		this.actionBlocking = actionBlocking;
+	}
+
+	public boolean isActionBlocking() {
+		return this.actionBlocking;
+	}
+
+	public void handleClick(@NotNull InventoryClickEvent event) {
 		int slot = event.getRawSlot();
+		int navStart = event.getView().getTopInventory().getSize() - 9;
 		Button button;
-		if (slot > 44) {
-			button = navigation.get(slot);
+
+		if (!navigation.isEmpty() && slot >= navStart) {
+				button = navigation.get(slot - navStart);
 		} else {
 			button = buttons.get(slot + startIndex);
 		}
+
 		if (button != null) {
 			button.getConsumer().accept(event);
 		}
 	}
 
-	public void addButton(Button button) {
+	public void addButton(@NotNull Button button) {
 		setButton(getHighestButton() + 1, button);
 	}
 
-	public void setButton(int slot, Button button) {
+	public void setButton(int slot, @Nullable Button button) {
+		if (slot < 0) {
+			throw new IllegalArgumentException("Button index must be >= 0!");
+		}
 		buttons.put(slot, button);
 	}
 
@@ -58,6 +75,7 @@ public class SimpleUI implements InventoryHolder {
 		buttons.remove(slot);
 	}
 
+	@Nullable
 	public Button getButton(int slot) {
 		return buttons.get(slot);
 	}
@@ -66,11 +84,18 @@ public class SimpleUI implements InventoryHolder {
 		return buttons.size() > 0 ? buttons.lastKey() : -1;
 	}
 
+	public void setNavButton(int slot, @Nullable Button button) {
+		if (slot < 0 || slot > 4) {
+			throw new IllegalArgumentException("Additional navigation buttons may only occupy indexes 0-4!");
+		}
+		navigation.put(2 + slot, button);
+	}
+
+	@NotNull
 	@Override
-	public @NotNull
-	Inventory getInventory() {
-		int highestIndex = buttons.size() > 0 ? buttons.lastKey() : 0;
-		int size = Math.min(54, Math.max(9, (int) Math.ceil(highestIndex / 9D) * 9));
+	public Inventory getInventory() {
+		int highestIndex = buttons.size() > 0 ? buttons.lastKey() + 1 : 0;
+		int size = Math.min(54, Math.max(9, (int) Math.ceil(highestIndex / 9D) * 9 + (navigation.isEmpty() ? 0 : 9)));
 		Inventory inventory = Bukkit.createInventory(this, size, name);
 		draw(inventory);
 		return inventory;
@@ -79,14 +104,14 @@ public class SimpleUI implements InventoryHolder {
 	public void draw(Inventory inventory) {
 		ItemStack[] contents = inventory.getContents();
 		Arrays.fill(contents, new ItemStack(Material.AIR));
-		int endIndex = startIndex + (contents.length == 54 ? contents.length - 9 : contents.length);
+		int endIndex = startIndex + (contents.length == 54 || !navigation.isEmpty() ? contents.length - 9 : contents.length);
 		SortedMap<Integer, Button> sortedMap = buttons.subMap(startIndex, endIndex);
 
 		sortedMap.forEach((index, button) -> contents[index - startIndex] = button.getItem());
 
 		if (contents.length == 54) {
 			// First page button
-			navigation.put(45, ((Supplier<Button>) () -> {
+			navigation.put(0, ((Supplier<Button>) () -> {
 				int maxPage = (int) Math.ceil(getHighestButton() / 45D);
 				ItemStack itemStack;
 				Consumer<InventoryClickEvent> consumer;
@@ -119,7 +144,7 @@ public class SimpleUI implements InventoryHolder {
 			}).get());
 
 			// Previous page button
-			navigation.put(46, ((Supplier<Button>) () -> {
+			navigation.put(1, ((Supplier<Button>) () -> {
 				int maxPage = (int) Math.ceil(getHighestButton() / 45D);
 				ItemStack itemStack;
 				if (startIndex > 0) {
@@ -152,7 +177,7 @@ public class SimpleUI implements InventoryHolder {
 			}).get());
 
 			// Next page button
-			navigation.put(52, ((Supplier<Button>) () -> {
+			navigation.put(7, ((Supplier<Button>) () -> {
 				int highestCurrentButton = startIndex + 44;
 				int highestRequiredButton = getHighestButton();
 				int maxPage = (int) Math.ceil(highestRequiredButton / 45D);
@@ -187,7 +212,7 @@ public class SimpleUI implements InventoryHolder {
 			}).get());
 
 			// Last page button
-			navigation.put(53, ((Supplier<Button>) () -> {
+			navigation.put(8, ((Supplier<Button>) () -> {
 				int maxPage = (int) Math.ceil(getHighestButton() / 45D);
 				ItemStack itemStack;
 				Consumer<InventoryClickEvent> consumer;
@@ -217,8 +242,10 @@ public class SimpleUI implements InventoryHolder {
 				}
 				return new Button(itemStack, consumer);
 			}).get());
-
-			navigation.forEach((slot, button) -> contents[slot] = button.getItem());
+		}
+		if (!navigation.isEmpty()) {
+			int navStart = contents.length - 9;
+			navigation.forEach((slot, button) -> contents[slot + navStart] = button.getItem());
 		}
 
 		inventory.setContents(contents);
