@@ -46,6 +46,17 @@ public class SimpleUI implements InventoryHolder {
 
 	public void handleClick(@NotNull InventoryClickEvent event) {
 		int slot = event.getRawSlot();
+
+		if (slot < 0 || slot >= event.getView().getTopInventory().getSize()) {
+			// Click not in top inventory
+			if (this.isActionBlocking()) {
+				event.setCancelled(true);
+			}
+			return;
+		}
+
+		event.setCancelled(true);
+
 		int navStart = event.getView().getTopInventory().getSize() - 9;
 		Button button;
 
@@ -69,15 +80,6 @@ public class SimpleUI implements InventoryHolder {
 			throw new IllegalArgumentException("Button index must be >= 0!");
 		}
 		buttons.put(slot, button);
-	}
-
-	public void removeButton(int slot) {
-		buttons.remove(slot);
-	}
-
-	@Nullable
-	public Button getButton(int slot) {
-		return buttons.get(slot);
 	}
 
 	public int getHighestButton() {

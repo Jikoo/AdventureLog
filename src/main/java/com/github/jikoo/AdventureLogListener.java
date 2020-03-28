@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -33,23 +34,16 @@ public class AdventureLogListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onInventoryClick(InventoryClickEvent event) {
-		if (!(event.getView().getTopInventory().getHolder() instanceof SimpleUI)) {
-			return;
+		if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
+			((SimpleUI) event.getView().getTopInventory().getHolder()).handleClick(event);
 		}
+	}
 
-		int slot = event.getRawSlot();
-
-		if (slot < 0 || slot >= event.getView().getTopInventory().getSize()) {
-			// Click not in top inventory
-			if (((SimpleUI) event.getView().getTopInventory().getHolder()).isActionBlocking()) {
-				event.setCancelled(true);
-			}
-			return;
+	@EventHandler(ignoreCancelled = true)
+	public void onInventoryDrag(InventoryDragEvent event) {
+		if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
+			event.setCancelled(true);
 		}
-
-		event.setCancelled(true);
-
-		((SimpleUI) event.getView().getTopInventory().getHolder()).handleClick(event);
 	}
 
 	@EventHandler
