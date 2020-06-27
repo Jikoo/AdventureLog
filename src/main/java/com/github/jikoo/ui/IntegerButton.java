@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 public class IntegerButton extends Button {
 
@@ -63,7 +64,7 @@ public class IntegerButton extends Button {
 	}
 
 	@Override
-	public ItemStack getItem() {
+	public @NotNull ItemStack getItem() {
 		ItemStack item = super.getItem();
 		ItemMeta itemMeta = item.getItemMeta();
 		if (itemMeta != null) {

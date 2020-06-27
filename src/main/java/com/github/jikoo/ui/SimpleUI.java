@@ -93,9 +93,8 @@ public class SimpleUI implements InventoryHolder {
 		navigation.put(2 + slot, button);
 	}
 
-	@NotNull
 	@Override
-	public Inventory getInventory() {
+	public @NotNull Inventory getInventory() {
 		int highestIndex = buttons.size() > 0 ? buttons.lastKey() + 1 : 0;
 		int size = Math.min(54, Math.max(9, (int) Math.ceil(highestIndex / 9D) * 9 + (navigation.isEmpty() ? 0 : 9)));
 		Inventory inventory = Bukkit.createInventory(this, size, name);
@@ -103,7 +102,7 @@ public class SimpleUI implements InventoryHolder {
 		return inventory;
 	}
 
-	public void draw(Inventory inventory) {
+	public void draw(@NotNull Inventory inventory) {
 		ItemStack[] contents = inventory.getContents();
 		Arrays.fill(contents, new ItemStack(Material.AIR));
 		int endIndex = startIndex + (contents.length == 54 || !navigation.isEmpty() ? contents.length - 9 : contents.length);

@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class Button {
 
@@ -17,8 +18,8 @@ public class Button {
 		return empty;
 	}
 
-	private Supplier<ItemStack> item;
-	private Consumer<InventoryClickEvent> consumer;
+	private final Supplier<ItemStack> item;
+	private final Consumer<InventoryClickEvent> consumer;
 
 	public Button(ItemStack item, Consumer<InventoryClickEvent> consumer) {
 		this.item = () -> item;
@@ -30,11 +31,11 @@ public class Button {
 		this.consumer = consumer;
 	}
 
-	public ItemStack getItem(){
+	public @NotNull ItemStack getItem(){
 		return item.get();
 	}
 
-	public Consumer<InventoryClickEvent> getConsumer(){
+	public @NotNull Consumer<InventoryClickEvent> getConsumer(){
 		return consumer;
 	}
 

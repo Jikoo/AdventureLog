@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 public class AdventureLogListener implements Listener {
 
@@ -33,21 +34,21 @@ public class AdventureLogListener implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void onInventoryClick(InventoryClickEvent event) {
+	public void onInventoryClick(@NotNull InventoryClickEvent event) {
 		if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
 			((SimpleUI) event.getView().getTopInventory().getHolder()).handleClick(event);
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void onInventoryDrag(InventoryDragEvent event) {
+	public void onInventoryDrag(@NotNull InventoryDragEvent event) {
 		if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event) {
+	public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
 		if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
 			return;
 		}
@@ -93,7 +94,7 @@ public class AdventureLogListener implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerRecipeDiscover(PlayerRecipeDiscoverEvent event) {
+	public void onPlayerRecipeDiscover(@NotNull PlayerRecipeDiscoverEvent event) {
 		NamespacedKey recipe = event.getRecipe();
 
 		if (recipe.getNamespace().equals(plugin.getName().toLowerCase()) && recipe.getKey().equals("adventure_log")) {
@@ -108,6 +109,7 @@ public class AdventureLogListener implements Listener {
 		private final Location teleportTo;
 		private final int maxCycles;
 		private int count = 0;
+
 		DelayedTeleport(Player target, Location teleportTo, int seconds) {
 			this.target = target;
 			this.teleportTo = teleportTo;

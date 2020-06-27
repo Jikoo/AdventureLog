@@ -91,7 +91,7 @@ public class DataStore {
 		defaultWaypoints.addAll(waypointStorage.getStringList("defaults"));
 	}
 
-	private Waypoint loadWaypoint(YamlConfiguration storage, String waypointName) {
+	private @Nullable Waypoint loadWaypoint(YamlConfiguration storage, String waypointName) {
 		Location location = storage.getSerializable(String.format(WAYPOINT_LOCATION, waypointName), Location.class);
 		ItemStack icon = storage.getSerializable(String.format(WAYPOINT_ICON, waypointName), ItemStack.class);
 		if (icon == null || icon.getType() == Material.AIR || location == null) {
