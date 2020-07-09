@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
@@ -27,14 +26,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class AdventureLogPlugin extends JavaPlugin {
 
+	public final NamespacedKey waypointRecipeKey = new NamespacedKey(this, "adventure_log");
 	private ItemStack waypointBook;
 	private DataStore dataStore;
 
 	@Override
 	public void onEnable() {
+		saveDefaultConfig();
+
 		this.dataStore = new DataStore(this);
 
-		NamespacedKey waypointRecipeKey = new NamespacedKey(this, "adventure_log");
 		ShapelessRecipe recipe = new ShapelessRecipe(waypointRecipeKey, new ItemStack(Material.KNOWLEDGE_BOOK));
 		recipe.addIngredient(Material.PETRIFIED_OAK_SLAB);
 		getServer().addRecipe(recipe);
@@ -58,9 +59,7 @@ public class AdventureLogPlugin extends JavaPlugin {
 		addExecutor("locklogwaypoint", executor);
 
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> getServer().getOnlinePlayers().forEach(player -> {
-			if ((player.getGameMode() != GameMode.SURVIVAL && player.getGameMode() != GameMode.ADVENTURE)
-					|| !player.getInventory().contains(getWaypointBook())) {
-				// Require survival/adventure and waypoint book in inventory to discover waypoints
+			if (!canDiscoverWaypoints(player)) {
 				return;
 			}
 
@@ -76,6 +75,27 @@ public class AdventureLogPlugin extends JavaPlugin {
 					});
 			}
 		), 60L, 60L);
+	}
+
+	private boolean canDiscoverWaypoints(Player player) {
+		// Must be in acceptable game mode to discover waypoints
+		if (!getConfig().getStringList("discovery.gamemodes").contains(player.getGameMode().name())) {
+			return false;
+		}
+
+		// Is book required?
+		if (!getConfig().getBoolean("discovery.requires-book")) {
+			return true;
+		}
+
+		// Check inventory for book
+		for (ItemStack itemStack : player.getInventory().getContents()) {
+			if (isWaypointBook(itemStack)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private void addExecutor(String command, TabExecutor tabExecutor) {
@@ -121,8 +141,8 @@ public class AdventureLogPlugin extends JavaPlugin {
 		return waypointBook.clone();
 	}
 
-	boolean isWaypointBook(@NotNull ItemStack itemStack) {
-		if (itemStack.getType() != Material.KNOWLEDGE_BOOK || !itemStack.hasItemMeta()) {
+	boolean isWaypointBook(@Nullable ItemStack itemStack) {
+		if (itemStack == null || itemStack.getType() != Material.KNOWLEDGE_BOOK || !itemStack.hasItemMeta()) {
 			return false;
 		}
 

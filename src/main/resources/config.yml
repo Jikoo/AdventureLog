@@ -1,0 +1,5 @@
+discovery:
+  requires-book: true
+  gamemodes:
+    - SURVIVAL
+    - ADVENTURE

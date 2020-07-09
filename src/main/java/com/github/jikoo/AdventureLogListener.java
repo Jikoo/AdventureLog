@@ -7,7 +7,6 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -95,9 +94,7 @@ public class AdventureLogListener implements Listener {
 
 	@EventHandler
 	public void onPlayerRecipeDiscover(@NotNull PlayerRecipeDiscoverEvent event) {
-		NamespacedKey recipe = event.getRecipe();
-
-		if (recipe.getNamespace().equals(plugin.getName().toLowerCase()) && recipe.getKey().equals("adventure_log")) {
+		if (plugin.waypointRecipeKey.equals(event.getRecipe())) {
 			event.setCancelled(true);
 		}
 	}
