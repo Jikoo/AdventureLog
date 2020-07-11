@@ -1,7 +1,7 @@
 package com.github.jikoo.commands;
 
 import com.github.jikoo.AdventureLogPlugin;
-import com.github.jikoo.Waypoint;
+import com.github.jikoo.data.Waypoint;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -76,15 +76,15 @@ public class ManageUnlockedWaypointsCommand implements TabExecutor {
 				return Collections.emptyList();
 			}
 
-			Collection<Waypoint> waypoints;
+			Collection<? extends Waypoint> waypoints;
 			if (command.getName().contains("un")) {
 				waypoints = plugin.getDataStore().getWaypoints();
-				Collection<Waypoint> unlocked = plugin.getDataStore().getWaypoints(target.getUniqueId());
+				Collection<? extends Waypoint> unlocked = plugin.getDataStore().getWaypoints(target.getUniqueId());
 				waypoints = waypoints.stream().filter(waypoint -> unlocked.stream().noneMatch(waypoint::equals))
 						.collect(Collectors.toList());
 			} else {
 				waypoints = plugin.getDataStore().getWaypoints(target.getUniqueId());
-				Collection<Waypoint> defaults = plugin.getDataStore().getDefaultWaypoints();
+				Collection<? extends Waypoint> defaults = plugin.getDataStore().getDefaultWaypoints();
 				waypoints = waypoints.stream().filter(waypoint -> defaults.stream().noneMatch(waypoint::equals))
 						.collect(Collectors.toList());
 			}

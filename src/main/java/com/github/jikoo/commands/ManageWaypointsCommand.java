@@ -1,7 +1,8 @@
 package com.github.jikoo.commands;
 
 import com.github.jikoo.AdventureLogPlugin;
-import com.github.jikoo.Waypoint;
+import com.github.jikoo.data.ServerWaypoint;
+import com.github.jikoo.data.Waypoint;
 import com.github.jikoo.ui.BooleanButton;
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.IntegerButton;
@@ -66,7 +67,7 @@ public class ManageWaypointsCommand implements TabExecutor {
 	private Button createOrEdit(@Nullable Waypoint waypoint) {
 		ItemStack itemStack;
 		if (waypoint != null) {
-			if (plugin.getDataStore().getWaypoint(waypoint.getName()) == null) {
+			if (plugin.getDataStore().getServerWaypoint(waypoint.getName()) == null) {
 				// Waypoint has been deleted.
 				return Button.empty();
 			}
@@ -78,8 +79,8 @@ public class ManageWaypointsCommand implements TabExecutor {
 							location.getWorld() == null ? "invalid_world" : location.getWorld().getName(),
 							location.getBlockX(), location.getBlockY(), location.getBlockZ()),
 					ChatColor.WHITE + "Priority: " + ChatColor.GOLD + waypoint.getPriority(),
-					ChatColor.WHITE + "Discovery range: " + ChatColor.GOLD + (waypoint.getRangeSquared() < 1 ? -1 : (int) Math.sqrt(waypoint.getRangeSquared())),
-					ChatColor.WHITE + "Always Discovered: " + ChatColor.GOLD + plugin.getDataStore().isDefault(waypoint),
+					ChatColor.WHITE + "Discovery range: " + ChatColor.GOLD + (!(waypoint instanceof ServerWaypoint) ? -1 : ((ServerWaypoint) waypoint).getRangeSquared() < 1 ? -1 : (int) Math.sqrt(((ServerWaypoint) waypoint).getRangeSquared())),
+					ChatColor.WHITE + "Always Discovered: " + ChatColor.GOLD + (!(waypoint instanceof ServerWaypoint) || ((ServerWaypoint) waypoint).isDefault()),
 					"", ChatColor.RED + "Ctrl+drop to delete.");
 		} else {
 			itemStack = new ItemStack(Material.WRITABLE_BOOK);
@@ -184,13 +185,20 @@ public class ManageWaypointsCommand implements TabExecutor {
 			AtomicInteger priority = new AtomicInteger(waypoint != null ? waypoint.getPriority() : 0);
 			ui.addButton(new IntegerButton(priority, Material.EMERALD, "Priority"));
 
-			// BUTTON: Set range. Range is later squared, so max possible value is floor(sqrt(2^31-1))
-			AtomicInteger range = new AtomicInteger(waypoint != null ? waypoint.getRangeSquared() < 1 ? -1 : (int) Math.sqrt(waypoint.getRangeSquared()) : 30);
-			ui.addButton(new IntegerButton(range, -1, 46340, Material.LEAD, "Discovery Range", ChatColor.GOLD + "-1 = Disable discovery"));
+			AtomicBoolean defaultDiscovered;
+			AtomicInteger range;
+			if (waypoint instanceof ServerWaypoint) {
+				ServerWaypoint serverWaypoint = (ServerWaypoint) waypoint;
+				range = new AtomicInteger(serverWaypoint.getRangeSquared() < 1 ? -1 : (int) Math.sqrt(serverWaypoint.getRangeSquared()));
+				ui.addButton(new IntegerButton(range, -1, Integer.MAX_VALUE, Material.LEAD, "Discovery Range", ChatColor.GOLD + "-1 = Disable discovery"));
 
-			// BUTTON: Set default discovered
-			AtomicBoolean defaultWaypoint = new AtomicBoolean(waypoint != null && plugin.getDataStore().isDefault(waypoint));
-			ui.addButton(new BooleanButton(defaultWaypoint, Material.GREEN_STAINED_GLASS_PANE, Material.RED_STAINED_GLASS_PANE, "Always Discovered"));
+				// BUTTON: Set default discovered
+				defaultDiscovered = new AtomicBoolean(serverWaypoint.isDefault());
+				ui.addButton(new BooleanButton(defaultDiscovered, Material.GREEN_STAINED_GLASS_PANE, Material.RED_STAINED_GLASS_PANE, "Always Discovered"));
+			} else {
+				defaultDiscovered = null;
+				range = null;
+			}
 
 			// BUTTON: Finalize waypoint
 			ui.setButton(8, new Button(() -> {
@@ -208,19 +216,17 @@ public class ManageWaypointsCommand implements TabExecutor {
 				if (waypoint != null && event1.getWhoClicked() instanceof Player) {
 					openEditor((Player) event1.getWhoClicked());
 					// TODO move into buttons?
-					waypoint.setRange(range.get());
 					waypoint.setPriority(priority.get());
-					if (defaultWaypoint.get()) {
-						plugin.getDataStore().addDefault(waypoint.getName());
-					} else {
-						plugin.getDataStore().removeDefault(waypoint.getName());
+					if (waypoint instanceof ServerWaypoint) {
+						ServerWaypoint serverWaypoint = (ServerWaypoint) waypoint;
+						serverWaypoint.setRange(range.get());
+						serverWaypoint.setDefault(defaultDiscovered.get());
 					}
-					// TODO lazy save
 					return;
 				}
 				if (waypointItem.getType() != Material.AIR && event1.getWhoClicked() instanceof Player) {
 					event1.getWhoClicked().closeInventory();
-					requestWaypointName((Player) event1.getWhoClicked(), waypointItem, priority.get(), range.get(), defaultWaypoint.get());
+					requestWaypointName((Player) event1.getWhoClicked(), waypointItem, priority.get(), range, defaultDiscovered);
 				}
 			}));
 
@@ -250,7 +256,8 @@ public class ManageWaypointsCommand implements TabExecutor {
 		itemStack.setItemMeta(itemMeta);
 	}
 
-	private void requestWaypointName(Player player, ItemStack waypointItem, int priority, int range, boolean defaultWaypoint) {
+	private void requestWaypointName(Player player, ItemStack waypointItem, int priority,
+			@Nullable AtomicInteger range, @Nullable AtomicBoolean defaultDiscovered) {
 		Conversation conversation = new ConversationFactory(plugin).withLocalEcho(false).withModality(false).withFirstPrompt(new Prompt() {
 			@NotNull
 			@Override
@@ -272,16 +279,19 @@ public class ManageWaypointsCommand implements TabExecutor {
 				if (input == null || !input.matches("[a-z_0-9]+")) {
 					return this;
 				}
-				if (plugin.getDataStore().getWaypoint(input) != null) {
+				if (plugin.getDataStore().getServerWaypoint(input) != null) {
 					player.sendMessage(ChatColor.RED + "A waypoint by the name \"" + ChatColor.AQUA + input + ChatColor.RED + "\" already exists! Please edit it instead.");
 					return Prompt.END_OF_CONVERSATION;
 				}
 
-				Waypoint waypoint = new Waypoint.Builder(input).setLocation(player.getLocation())
-						.setIcon(waypointItem).setPriority(priority).setRange(range).build();
-				plugin.getDataStore().addWaypoint(waypoint);
-				if (defaultWaypoint) {
-					plugin.getDataStore().addDefault(input);
+				// TODO rework for individual waypoints
+				ServerWaypoint waypoint = plugin.getDataStore().addServerWaypoint(input, waypointItem, player.getLocation());
+				waypoint.setPriority(priority);
+				if (range != null) {
+					waypoint.setRange(range.get());
+				}
+				if (defaultDiscovered != null) {
+					waypoint.setDefault(defaultDiscovered.get());
 				}
 				player.sendTitle("",ChatColor.GREEN + "Waypoint created successfully!", 10, 50, 20);
 				return Prompt.END_OF_CONVERSATION;

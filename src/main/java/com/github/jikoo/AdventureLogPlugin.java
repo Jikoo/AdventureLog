@@ -57,45 +57,6 @@ public class AdventureLogPlugin extends JavaPlugin {
 		TabExecutor executor = new ManageUnlockedWaypointsCommand(this);
 		addExecutor("unlocklogwaypoint", executor);
 		addExecutor("locklogwaypoint", executor);
-
-		getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> getServer().getOnlinePlayers().forEach(player -> {
-			if (!canDiscoverWaypoints(player)) {
-				return;
-			}
-
-			getDataStore().getWaypoints().stream().filter(waypoint ->
-					getDataStore().getDefaultWaypoints().stream().noneMatch(waypoint::equals)
-							&& getDataStore().getWaypoints(player.getUniqueId()).stream().noneMatch(waypoint::equals))
-					.forEach(waypoint -> {
-						if (waypoint.getRangeSquared() > -1 && player.getWorld().equals(waypoint.getLocation().getWorld())
-								&& player.getLocation().distanceSquared(waypoint.getLocation()) <= waypoint.getRangeSquared()
-								&& getDataStore().unlockWaypoint(player.getUniqueId(), waypoint.getName()) == DataStore.Result.SUCCESS) {
-							player.sendTitle("Waypoint discovered!", "Check your Adventure Log.", 10, 50, 20);
-						}
-					});
-			}
-		), 60L, 60L);
-	}
-
-	private boolean canDiscoverWaypoints(Player player) {
-		// Must be in acceptable game mode to discover waypoints
-		if (!getConfig().getStringList("discovery.gamemodes").contains(player.getGameMode().name())) {
-			return false;
-		}
-
-		// Is book required?
-		if (!getConfig().getBoolean("discovery.requires-book")) {
-			return true;
-		}
-
-		// Check inventory for book
-		for (ItemStack itemStack : player.getInventory().getContents()) {
-			if (isWaypointBook(itemStack)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	private void addExecutor(String command, TabExecutor tabExecutor) {
@@ -113,9 +74,8 @@ public class AdventureLogPlugin extends JavaPlugin {
 		dataStore.save();
 	}
 
-	@Nullable
 	@Override
-	public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
+	public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
 			@NotNull String[] args) {
 		if (args.length == 0) {
 			return ImmutableList.of();
