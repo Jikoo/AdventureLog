@@ -8,17 +8,23 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class YamlData {
 
+	private final Plugin plugin;
 	private final File file;
 	private final YamlConfiguration storage;
 	private boolean dirty = false;
+	private BukkitTask saveTask;
 
-	public YamlData(File file) {
+	public YamlData(Plugin plugin, File file) {
+		this.plugin = plugin;
 		this.file = file;
 		this.storage = YamlConfiguration.loadConfiguration(file);
 	}
@@ -26,11 +32,11 @@ public abstract class YamlData {
 	void set(@NotNull String path, @Nullable Object value) {
 		Object existing = this.storage.get(path);
 		if (Objects.equals(value, existing)) {
-			// TODO should consider List contents comparison
 			return;
 		}
 		this.storage.set(path, value);
 		this.dirty = true;
+		save();
 	}
 
 	@Nullable Object get(@NotNull String path) {
@@ -81,7 +87,46 @@ public abstract class YamlData {
 		return this.storage.getLocation(path);
 	}
 
-	public void save() throws IOException {
+	@NotNull YamlConfiguration raw() {
+		return this.storage;
+	}
+
+	void save() {
+		if (saveTask != null || !dirty) {
+			return;
+		}
+		try {
+			saveTask = new BukkitRunnable() {
+				@Override
+				public void run() {
+					try {
+						saveNow();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+
+				@Override
+				public synchronized void cancel() throws IllegalStateException {
+					super.cancel();
+					try {
+						saveNow();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}.runTaskLater(plugin, 200L);
+		} catch (IllegalStateException e) {
+			// Plugin is being disabled, cannot schedule tasks
+			try {
+				saveNow();
+			} catch (IOException ioException) {
+				ioException.printStackTrace();
+			}
+		}
+	}
+
+	private void saveNow() throws IOException {
 		if (!this.dirty) {
 			return;
 		}

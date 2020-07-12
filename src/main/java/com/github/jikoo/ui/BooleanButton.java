@@ -15,7 +15,7 @@ public class BooleanButton extends Button {
 	private final String name;
 
 	public BooleanButton(AtomicBoolean value, Material materialTrue, Material materialFalse, String name) {
-		super(getItem(value, materialTrue, materialFalse, name), event -> {
+		super(() -> getItem(value, materialTrue, materialFalse, name), event -> {
 			value.set(!value.get());
 
 			if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {

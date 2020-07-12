@@ -54,7 +54,7 @@ public class ManageWaypointsCommand implements TabExecutor {
 	private void openEditor(Player player) {
 		SimpleUI ui = new SimpleUI(ChatColor.DARK_RED + "Adventure Log Editor", false);
 
-		plugin.getDataStore().getWaypoints().forEach(waypoint -> {
+		plugin.getDataManager().getServerData().getWaypoints().forEach(waypoint -> {
 			Button button = createOrEdit(waypoint);
 			ui.addButton(button);
 		});
@@ -67,7 +67,7 @@ public class ManageWaypointsCommand implements TabExecutor {
 	private Button createOrEdit(@Nullable Waypoint waypoint) {
 		ItemStack itemStack;
 		if (waypoint != null) {
-			if (plugin.getDataStore().getServerWaypoint(waypoint.getName()) == null) {
+			if (plugin.getDataManager().getServerData().getWaypoint(waypoint.getName()) == null) {
 				// Waypoint has been deleted.
 				return Button.empty();
 			}
@@ -100,7 +100,7 @@ public class ManageWaypointsCommand implements TabExecutor {
 			if (waypoint != null) {
 				// Delete waypoint on ctrl+drop
 				if (event.getClick() == ClickType.CONTROL_DROP) {
-					plugin.getDataStore().removeWaypoint(waypoint.getName());
+					waypoint.delete();
 					itemStack.setType(Material.AIR);
 
 					if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
@@ -279,13 +279,13 @@ public class ManageWaypointsCommand implements TabExecutor {
 				if (input == null || !input.matches("[a-z_0-9]+")) {
 					return this;
 				}
-				if (plugin.getDataStore().getServerWaypoint(input) != null) {
+				if (plugin.getDataManager().getServerData().getWaypoint(input) != null) {
 					player.sendMessage(ChatColor.RED + "A waypoint by the name \"" + ChatColor.AQUA + input + ChatColor.RED + "\" already exists! Please edit it instead.");
 					return Prompt.END_OF_CONVERSATION;
 				}
 
 				// TODO rework for individual waypoints
-				ServerWaypoint waypoint = plugin.getDataStore().addServerWaypoint(input, waypointItem, player.getLocation());
+				ServerWaypoint waypoint = plugin.getDataManager().getServerData().addWaypoint(input, waypointItem, player.getLocation());
 				waypoint.setPriority(priority);
 				if (range != null) {
 					waypoint.setRange(range.get());

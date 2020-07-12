@@ -3,3 +3,22 @@ discovery:
   gamemodes:
     - SURVIVAL
     - ADVENTURE
+
+# Homes feature - personal customizable locations
+personal:
+  # Add respawn location as waypoint
+  respawn-point:
+    as-waypoint: true
+    # Fall through to default world spawn if bed/anchor missing
+    default-to-spawn: true
+  # Default world spawn as a personal waypoint
+  # It is recommended that you make a special high priority waypoint instead for maximum customization.
+  spawn-as-waypoint: false
+  # All permissions are formatted from local path, i.e. "adventurelog.personal.1"
+  # Note that "unlimited" is a reserved path that always grants the maximum integer value.
+  permissions:
+    1: 1
+    2: 2
+    default: 1
+    vip: 2
+    staff: 3

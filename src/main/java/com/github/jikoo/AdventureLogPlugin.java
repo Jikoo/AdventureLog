@@ -14,6 +14,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapelessRecipe;
@@ -28,13 +29,13 @@ public class AdventureLogPlugin extends JavaPlugin {
 
 	public final NamespacedKey waypointRecipeKey = new NamespacedKey(this, "adventure_log");
 	private ItemStack waypointBook;
-	private DataStore dataStore;
+	private DataManager dataManager;
 
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
 
-		this.dataStore = new DataStore(this);
+		this.dataManager = new DataManager(this);
 
 		ShapelessRecipe recipe = new ShapelessRecipe(waypointRecipeKey, new ItemStack(Material.KNOWLEDGE_BOOK));
 		recipe.addIngredient(Material.PETRIFIED_OAK_SLAB);
@@ -70,11 +71,6 @@ public class AdventureLogPlugin extends JavaPlugin {
 	}
 
 	@Override
-	public void onDisable() {
-		dataStore.save();
-	}
-
-	@Override
 	public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
 			@NotNull String[] args) {
 		if (args.length == 0) {
@@ -93,15 +89,15 @@ public class AdventureLogPlugin extends JavaPlugin {
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
-	public DataStore getDataStore() {
-		return this.dataStore;
+	public DataManager getDataManager() {
+		return this.dataManager;
 	}
 
 	public @NotNull ItemStack getWaypointBook() {
 		return waypointBook.clone();
 	}
 
-	boolean isWaypointBook(@Nullable ItemStack itemStack) {
+	public boolean isWaypointBook(@Nullable ItemStack itemStack) {
 		if (itemStack == null || itemStack.getType() != Material.KNOWLEDGE_BOOK || !itemStack.hasItemMeta()) {
 			return false;
 		}
@@ -113,6 +109,23 @@ public class AdventureLogPlugin extends JavaPlugin {
 
 		return ((KnowledgeBookMeta) itemMeta).getRecipes().stream().anyMatch(key ->
 				key.getNamespace().equals(getName().toLowerCase()) && key.getKey().equals("adventure_log"));
+	}
+
+	public int getPermittedPersonalWarps(Player player) {
+		if (player.hasPermission("adventurelog.personal.unlimited")) {
+			return Integer.MAX_VALUE;
+		}
+		ConfigurationSection permissionSection = this.getConfig().getConfigurationSection("personal.permissions");
+		if (permissionSection == null) {
+			return 0;
+		}
+		for (String key : permissionSection.getKeys(true)) {
+			if (!permissionSection.isInt(key) || !player.hasPermission("adventurelog.personal." + key)) {
+				continue;
+			}
+			return permissionSection.getInt(key);
+		}
+		return 0;
 	}
 
 }

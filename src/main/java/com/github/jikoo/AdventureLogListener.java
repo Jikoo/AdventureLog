@@ -1,16 +1,7 @@
 package com.github.jikoo;
 
-import com.github.jikoo.ui.Button;
+import com.github.jikoo.ui.AdventureLogUI;
 import com.github.jikoo.ui.SimpleUI;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,8 +11,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 public class AdventureLogListener implements Listener {
@@ -69,25 +58,7 @@ public class AdventureLogListener implements Listener {
 		event.setUseInteractedBlock(Event.Result.DENY);
 		event.setUseItemInHand(Event.Result.DENY);
 
-		SimpleUI ui = new SimpleUI(ChatColor.DARK_PURPLE + "Adventure Log");
-		plugin.getDataStore().getWaypoints(event.getPlayer().getUniqueId()).forEach(waypoint -> {
-			Button button = new Button(waypoint.getIcon(), inventoryClickEvent -> {
-				inventoryClickEvent.setCancelled(true);
-				Bukkit.getScheduler().runTask(plugin, () -> inventoryClickEvent.getWhoClicked().closeInventory());
-				if (!(inventoryClickEvent.getWhoClicked() instanceof Player)) {
-					return;
-				}
-				Player player = (Player) inventoryClickEvent.getWhoClicked();
-				if (!waypoint.getLocation().isWorldLoaded()) {
-					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("World not loaded!", ChatColor.RED));
-					return;
-				}
-				new DelayedTeleport(player, waypoint.getLocation(), 3)
-						.runTaskTimer(plugin, 0L, 2L);
-			});
-			ui.addButton(button);
-		});
-
+		SimpleUI ui = new AdventureLogUI(plugin, event.getPlayer());
 		event.getPlayer().openInventory(ui.getInventory());
 
 	}
@@ -96,64 +67,6 @@ public class AdventureLogListener implements Listener {
 	public void onPlayerRecipeDiscover(@NotNull PlayerRecipeDiscoverEvent event) {
 		if (plugin.waypointRecipeKey.equals(event.getRecipe())) {
 			event.setCancelled(true);
-		}
-	}
-
-	private class DelayedTeleport extends BukkitRunnable {
-		private final BossBar bossBar;
-		private final Player target;
-		private final Vector originalLocation;
-		private final Location teleportTo;
-		private final int maxCycles;
-		private int count = 0;
-
-		DelayedTeleport(Player target, Location teleportTo, int seconds) {
-			this.target = target;
-			this.teleportTo = teleportTo;
-			bossBar = plugin.getServer().createBossBar("Concentrating...", BarColor.PURPLE, BarStyle.SEGMENTED_20);
-			bossBar.setProgress(0);
-			bossBar.addPlayer(target);
-			originalLocation = target.getLocation().toVector();
-			maxCycles = seconds * 10;
-		}
-
-		@Override
-		public void run() {
-			if (moved()) {
-				target.sendMessage("You have to maintain concentration to remember the way!");
-				bossBar.removeAll();
-				cancel();
-				return;
-			}
-
-			if (count >= maxCycles) {
-				target.teleport(teleportTo);
-				bossBar.removeAll();
-				cancel();
-				return;
-			}
-			this.bossBar.setProgress(count * 1D / maxCycles);
-			++count;
-		}
-
-		private boolean moved() {
-			if (!target.isOnline()) {
-				return true;
-			}
-			Location newLocation = target.getLocation();
-			double min = Math.min(originalLocation.getX(), newLocation.getX());
-			double max = originalLocation.getX() == min ? newLocation.getX() : originalLocation.getX();
-			if (Math.abs(max - min) > 1) {
-				return true;
-			}
-			min = Math.min(originalLocation.getY(), newLocation.getY());
-			max = originalLocation.getY() == min ? newLocation.getY() : originalLocation.getY();
-			if (Math.abs(max - min) > 1) {
-				return true;
-			}
-			min = Math.min(originalLocation.getZ(), newLocation.getZ());
-			max = originalLocation.getZ() == min ? newLocation.getZ() : originalLocation.getZ();
-			return Math.abs(max - min) > 1;
 		}
 	}
 

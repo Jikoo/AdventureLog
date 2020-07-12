@@ -20,7 +20,7 @@ public class IntegerButton extends Button {
 	}
 
 	public IntegerButton(AtomicInteger value, int minValue, int maxValue, Material type, String name, String... additionalInfo) {
-		super(getItem(value, type, name, additionalInfo), event -> {
+		super(() -> getItem(value, type, name, additionalInfo), event -> {
 			int diff;
 			switch (event.getClick()) {
 				case LEFT:

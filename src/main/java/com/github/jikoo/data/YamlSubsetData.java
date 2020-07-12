@@ -70,7 +70,7 @@ public abstract class YamlSubsetData {
 		return this.storage.getLocation(this.path + path);
 	}
 
-	@NotNull YamlData promiseMeThatYouKnowWhatYouAreDoing() {
+	@NotNull YamlData raw() {
 		return this.storage;
 	}
 

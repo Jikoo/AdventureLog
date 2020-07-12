@@ -1,6 +1,7 @@
 package com.github.jikoo.commands;
 
 import com.github.jikoo.AdventureLogPlugin;
+import com.github.jikoo.data.ServerWaypoint;
 import com.github.jikoo.data.Waypoint;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,21 +45,13 @@ public class ManageUnlockedWaypointsCommand implements TabExecutor {
 			return true;
 		}
 
-		switch (unlock ? plugin.getDataStore().unlockWaypoint(target.getUniqueId(), args[1])
-				: plugin.getDataStore().lockWaypoint(target.getUniqueId(), args[1])) {
-
-			case SUCCESS:
-				if (unlock) {
-					target.sendTitle("Waypoint discovered!", "Check your Adventure Log.", 10, 50, 20);
-				}
-			case UNNECESSARY:
-				sender.sendMessage((unlock ? "Unl" : "L") + "ocked waypoint!");
-				return true;
-			case FAILURE:
-			default:
-				sender.sendMessage("Failed to " + (unlock ? "un" : "") + "lock waypoint! Please check server logs.");
-				return true;
+		if (unlock ? plugin.getDataManager().getUserData(target.getUniqueId()).unlockWaypoint(args[1])
+				: plugin.getDataManager().getUserData(target.getUniqueId()).lockWaypoint(args[1])) {
+			target.sendTitle("Waypoint discovered!", "Check your Adventure Log.", 10, 50, 20);
 		}
+
+		sender.sendMessage((unlock ? "Unl" : "L") + "ocked waypoint!");
+		return true;
 
 	}
 
@@ -76,17 +69,14 @@ public class ManageUnlockedWaypointsCommand implements TabExecutor {
 				return Collections.emptyList();
 			}
 
-			Collection<? extends Waypoint> waypoints;
+			Collection<ServerWaypoint> waypoints;
 			if (command.getName().contains("un")) {
-				waypoints = plugin.getDataStore().getWaypoints();
-				Collection<? extends Waypoint> unlocked = plugin.getDataStore().getWaypoints(target.getUniqueId());
+				waypoints = plugin.getDataManager().getServerData().getWaypoints();
+				Collection<ServerWaypoint> unlocked = plugin.getDataManager().getUserData(target.getUniqueId()).getUnlockedWaypoints();
 				waypoints = waypoints.stream().filter(waypoint -> unlocked.stream().noneMatch(waypoint::equals))
 						.collect(Collectors.toList());
 			} else {
-				waypoints = plugin.getDataStore().getWaypoints(target.getUniqueId());
-				Collection<? extends Waypoint> defaults = plugin.getDataStore().getDefaultWaypoints();
-				waypoints = waypoints.stream().filter(waypoint -> defaults.stream().noneMatch(waypoint::equals))
-						.collect(Collectors.toList());
+				waypoints = plugin.getDataManager().getUserData(target.getUniqueId()).getUnlockedWaypoints();
 			}
 
 			return waypoints.stream().map(Waypoint::getName)

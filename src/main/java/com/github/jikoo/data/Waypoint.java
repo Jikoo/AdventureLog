@@ -1,16 +1,13 @@
 package com.github.jikoo.data;
 
 import com.google.common.base.Preconditions;
-import java.util.Arrays;
 import java.util.Objects;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Waypoint extends YamlSubsetData {
+public class Waypoint extends YamlSubsetData implements IWaypoint {
 
 	private final String name;
 
@@ -26,11 +23,13 @@ public class Waypoint extends YamlSubsetData {
 		this.name = name;
 	}
 
+	@Override
 	@NotNull
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public @NotNull Location getLocation() {
 		return Objects.requireNonNull(this.getLocation("location"));
 	}
@@ -40,26 +39,21 @@ public class Waypoint extends YamlSubsetData {
 		this.set("location", location);
 	}
 
+	@Override
 	@NotNull
 	public ItemStack getIcon() {
 		ItemStack icon = this.getItemStack("icon");
 		if (icon != null && !icon.getType().isAir()) {
 			return icon;
 		}
-		ItemStack gollyGeeHeckers = new ItemStack(Material.DIRT);
-		ItemMeta thisIsABummer = gollyGeeHeckers.getItemMeta();
-		if (thisIsABummer != null) {
-			thisIsABummer.setDisplayName(getName());
-			thisIsABummer.setLore(Arrays.asList("Something went wrong loading icon!", "Please enjoy this complimentary dirt."));
-			gollyGeeHeckers.setItemMeta(thisIsABummer);
-		}
-		return gollyGeeHeckers;
+		return IWaypoint.super.getIcon();
 	}
 
 	public void setIcon(@NotNull ItemStack icon) {
 		this.set("icon", icon);
 	}
 
+	@Override
 	public int getPriority() {
 		return this.getInt("priority");
 	}
@@ -86,8 +80,8 @@ public class Waypoint extends YamlSubsetData {
 		return name.equals(other.name);
 	}
 
-	public boolean isValid() {
-		return this.getLocation("location") != null;
+	public boolean isInvalid() {
+		return this.getLocation("location") == null;
 	}
 
 }
