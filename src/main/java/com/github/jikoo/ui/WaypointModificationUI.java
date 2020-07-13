@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 public class WaypointModificationUI extends SimpleUI {
 
 	public WaypointModificationUI(@NotNull AdventureLogPlugin plugin, @Nullable Waypoint waypoint, @Nullable UUID owner) {
-		super(ChatColor.DARK_RED + (waypoint != null ? "Modify Waypoint: " + waypoint.getName() : "New Waypoint Creator"), false);
+		super(ChatColor.DARK_RED + (waypoint != null ? "Modify " + waypoint.getName() : "New Waypoint Creator"), false);
 
 		// BUTTON: set icon item
 		ItemStack waypointIcon;

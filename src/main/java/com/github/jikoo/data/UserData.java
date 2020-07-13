@@ -51,24 +51,26 @@ public class UserData extends YamlData {
 	}
 
 	public @NotNull UserWaypoint createWaypoint(@NotNull Location location) {
-		int nextAvailable = 0;
+		int nextAvailable = 1;
 		while (raw().isSet("waypoints." + nextAvailable)) {
 			++nextAvailable;
 		}
-		UserWaypoint waypoint = new UserWaypoint(this, String.valueOf(nextAvailable));
+		String name = String.valueOf(nextAvailable);
+		UserWaypoint waypoint = new UserWaypoint(this, name);
 		waypoint.setLocation(location);
+		this.waypoints.put(name, waypoint);
 		return waypoint;
 	}
 
 	public @NotNull Collection<ServerWaypoint> getUnlockedWaypoints() {
 		ServerData serverData = this.serverDataSupplier.get();
-		return this.getStringList("unlocked").stream().map(serverData::getWaypoint).filter(Objects::nonNull)
+		return this.getUnlocked().stream().map(serverData::getWaypoint).filter(Objects::nonNull)
 				.sorted(ServerWaypoint.COMPARATOR).collect(Collectors.toList());
 	}
 
 	public @NotNull Collection<ServerWaypoint> getAvailableWaypoints() {
 		ServerData serverData = this.serverDataSupplier.get();
-		return Stream.concat(this.getStringList("unlocked").stream(), serverData.getDefaultWaypointNames().stream())
+		return Stream.concat(this.getUnlocked().stream(), serverData.getDefaultWaypointNames().stream())
 				.distinct().map(serverData::getWaypoint).filter(Objects::nonNull).sorted(ServerWaypoint.COMPARATOR)
 				.collect(Collectors.toList());
 	}
@@ -78,7 +80,7 @@ public class UserData extends YamlData {
 	}
 
 	public boolean unlockWaypoint(@NotNull String waypointName) {
-		List<String> unlocked = getUnlocked();
+		List<String> unlocked = this.getUnlocked();
 		if (unlocked.contains(waypointName)) {
 			return false;
 		}

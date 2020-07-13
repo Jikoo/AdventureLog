@@ -58,7 +58,7 @@ public class AdventureLogListener implements Listener {
 		event.setUseInteractedBlock(Event.Result.DENY);
 		event.setUseItemInHand(Event.Result.DENY);
 
-		event.getPlayer().openInventory(new AdventureLogUI(plugin, event.getPlayer()).getInventory());
+		event.getPlayer().openInventory(new AdventureLogUI(plugin, event.getPlayer().getUniqueId(), event.getPlayer()).getInventory());
 
 	}
 

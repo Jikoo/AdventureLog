@@ -13,16 +13,20 @@ permissions:
       adventurelog.givelog.other: true
       adventurelog.unlockwaypoint: true
       adventurelog.lockwaypoint: true
-      adventurelog.manage.server: true
       adventurelog.view.other: true
+      adventurelog.manage.server: true
       adventurelog.manage.other: true
       adventurelog.personal.unlimited: true
 
 commands:
   givelog:
     description: Give a user an Adventure Log.
-    usage: /givelog [player]
+    usage: /<command> [player]
     permission: adventurelog.givelog
+  openlog:
+    description: Open the Adventure Log interface.
+    usage: /<command> [player]
+    permission: adventurelog.openlog
   managewaypoints:
     aliases: [editwaypoints]
     description: Manage Adventure Log waypoints
@@ -31,10 +35,10 @@ commands:
   unlocklogwaypoint:
     aliases: [unlockwaypoint]
     description: Unlock a new Adventure Log waypoint
-    usage: /unlocklogwaypoint <player> <name>
+    usage: /<command> <player> <name>
     permission: adventurelog.unlockwaypoint
   locklogwaypoint:
     aliases: [lockwaypoint]
     description: Lock an Adventure Log waypoint
-    usage: /locklogwaypoint <player> <name>
+    usage: /<command> <player> <name>
     permission: adventurelog.lockwaypoint

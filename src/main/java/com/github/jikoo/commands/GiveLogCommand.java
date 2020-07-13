@@ -52,7 +52,8 @@ public class GiveLogCommand implements TabExecutor {
 	@Override
 	public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
 			@NotNull String[] args) {
-		return args.length == 1 ? plugin.onTabComplete(sender, command, alias, args) : Collections.emptyList();
+		return args.length == 1 && sender.hasPermission("adventurelog.givelog.other")
+				? plugin.onTabComplete(sender, command, alias, args) : Collections.emptyList();
 	}
 
 }
