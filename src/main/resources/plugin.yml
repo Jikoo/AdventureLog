@@ -13,7 +13,9 @@ permissions:
       adventurelog.givelog.other: true
       adventurelog.unlockwaypoint: true
       adventurelog.lockwaypoint: true
-      adventurelog.managewaypoints: true
+      adventurelog.manage.server: true
+      adventurelog.view.other: true
+      adventurelog.manage.other: true
       adventurelog.personal.unlimited: true
 
 commands:

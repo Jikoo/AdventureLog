@@ -3,7 +3,6 @@ package com.github.jikoo.data;
 import java.util.ArrayList;
 import java.util.List;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.inventory.ItemStack;
@@ -12,13 +11,19 @@ import org.jetbrains.annotations.NotNull;
 
 public class UserWaypoint extends Waypoint {
 
-	public UserWaypoint(@NotNull UserData storage, @NotNull String name) {
+	UserWaypoint(@NotNull UserData storage, @NotNull String name) {
 		super(storage, name);
 	}
 
-	public UserWaypoint(@NotNull UserData storage, @NotNull String name, @NotNull Location location) {
-		super(storage, name);
-		this.setLocation(location);
+	@Override
+	public @NotNull String getName() {
+		String customName = this.getString("custom_name");
+		return customName != null ? customName : super.getName();
+	}
+
+	public @NotNull String getSortingName() {
+		String comparableName = this.getString("comparable_name");
+		return comparableName != null ? comparableName : getName();
 	}
 
 	@Override
@@ -31,10 +36,29 @@ public class UserWaypoint extends Waypoint {
 		}
 		ItemMeta itemMeta = icon.getItemMeta();
 		if (itemMeta != null && !itemMeta.hasDisplayName()) {
-			itemMeta.setDisplayName(ChatColor.WHITE + "Home " + getName());
+			itemMeta.setDisplayName(ChatColor.GOLD + "Home " + getName());
 			icon.setItemMeta(itemMeta);
 		}
 		return icon;
+	}
+
+	@Override
+	public void setIcon(@NotNull ItemStack icon) {
+		super.setIcon(icon);
+
+		// Lift icon name for later use in sorting
+		String displayName = null;
+		ItemMeta itemMeta = icon.getItemMeta();
+		if (itemMeta != null && itemMeta.hasDisplayName()) {
+			displayName = itemMeta.getDisplayName();
+			if (displayName.isEmpty()) {
+				displayName = null;
+			}
+		}
+
+		this.set("custom_name", displayName);
+		// TODO double check - stripColor appears to only consider upper case color codes while translate etc. create lower
+		this.set("comparable_name", displayName == null ? null : ChatColor.stripColor(displayName.toUpperCase()));
 	}
 
 	@Override

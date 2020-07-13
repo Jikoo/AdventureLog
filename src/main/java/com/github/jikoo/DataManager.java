@@ -3,11 +3,9 @@ package com.github.jikoo;
 import com.github.jikoo.data.ServerData;
 import com.github.jikoo.data.ServerWaypoint;
 import com.github.jikoo.data.UserData;
-import com.github.jikoo.data.Waypoint;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import java.util.Comparator;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.lucko.helper.bucket.BucketPartition;
@@ -16,8 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class DataManager {
-
-	public static final Comparator<Waypoint> WAYPOINT_COMPARATOR = Comparator.comparing(Waypoint::getPriority).reversed();
 
 	private final AdventureLogPlugin plugin;
 	private final ServerData serverData;

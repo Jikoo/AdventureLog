@@ -14,13 +14,12 @@ import org.jetbrains.annotations.NotNull;
 public class TeleportButton extends Button {
 
 	public TeleportButton(@NotNull Plugin plugin, @NotNull IWaypoint waypoint) {
-		super(waypoint.getIcon(), inventoryClickEvent -> {
-			inventoryClickEvent.setCancelled(true);
-			Bukkit.getScheduler().runTask(plugin, () -> inventoryClickEvent.getWhoClicked().closeInventory());
-			if (!(inventoryClickEvent.getWhoClicked() instanceof Player)) {
+		super(waypoint.getIcon(), event -> {
+			Bukkit.getScheduler().runTask(plugin, () -> event.getWhoClicked().closeInventory());
+			if (!(event.getWhoClicked() instanceof Player)) {
 				return;
 			}
-			Player player = (Player) inventoryClickEvent.getWhoClicked();
+			Player player = (Player) event.getWhoClicked();
 			Location destination = waypoint.getLocation();
 			if (!destination.isWorldLoaded()) {
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("World not loaded!", ChatColor.RED));

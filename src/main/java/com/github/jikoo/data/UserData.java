@@ -1,8 +1,8 @@
 package com.github.jikoo.data;
 
-import com.github.jikoo.DataManager;
 import java.io.File;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -46,20 +47,29 @@ public class UserData extends YamlData {
 	}
 
 	public @NotNull Collection<UserWaypoint> getUserWaypoints() {
-		// TODO sort to ensure numeric order if necessary
-		return this.waypoints.values();
+		return this.waypoints.values().stream().sorted(Comparator.comparing(UserWaypoint::getSortingName)).collect(Collectors.toList());
+	}
+
+	public @NotNull UserWaypoint createWaypoint(@NotNull Location location) {
+		int nextAvailable = 0;
+		while (raw().isSet("waypoints." + nextAvailable)) {
+			++nextAvailable;
+		}
+		UserWaypoint waypoint = new UserWaypoint(this, String.valueOf(nextAvailable));
+		waypoint.setLocation(location);
+		return waypoint;
 	}
 
 	public @NotNull Collection<ServerWaypoint> getUnlockedWaypoints() {
 		ServerData serverData = this.serverDataSupplier.get();
 		return this.getStringList("unlocked").stream().map(serverData::getWaypoint).filter(Objects::nonNull)
-				.sorted(DataManager.WAYPOINT_COMPARATOR).collect(Collectors.toList());
+				.sorted(ServerWaypoint.COMPARATOR).collect(Collectors.toList());
 	}
 
 	public @NotNull Collection<ServerWaypoint> getAvailableWaypoints() {
 		ServerData serverData = this.serverDataSupplier.get();
 		return Stream.concat(this.getStringList("unlocked").stream(), serverData.getDefaultWaypointNames().stream())
-				.distinct().map(serverData::getWaypoint).filter(Objects::nonNull).sorted(DataManager.WAYPOINT_COMPARATOR)
+				.distinct().map(serverData::getWaypoint).filter(Objects::nonNull).sorted(ServerWaypoint.COMPARATOR)
 				.collect(Collectors.toList());
 	}
 

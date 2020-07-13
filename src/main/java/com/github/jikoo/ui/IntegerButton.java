@@ -1,25 +1,32 @@
 package com.github.jikoo.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class IntegerButton extends Button {
 
-	private final AtomicInteger value;
-	private final String name;
-
-	public IntegerButton(AtomicInteger value, Material type, String name, String... additionalInfo) {
-		this(value, Integer.MIN_VALUE, Integer.MAX_VALUE, type, name, additionalInfo);
+	public IntegerButton(@NotNull AtomicInteger value, @NotNull Material type, @NotNull String name,
+			String @NotNull ... additionalInfo) {
+		this(value, type, null, name, additionalInfo);
 	}
 
-	public IntegerButton(AtomicInteger value, int minValue, int maxValue, Material type, String name, String... additionalInfo) {
+	public IntegerButton(@NotNull AtomicInteger value, @NotNull Material type, 
+			@Nullable Consumer<AtomicInteger> postprocess, @NotNull String name, String @NotNull ... additionalInfo) {
+		this(value, Integer.MIN_VALUE, Integer.MAX_VALUE, type, postprocess, name, additionalInfo);
+	}
+
+	public IntegerButton(@NotNull AtomicInteger value, Integer minValue, Integer maxValue, @NotNull Material type,
+			@NotNull String name, String @NotNull ... additionalInfo) {
+		this(value, minValue, maxValue, type, null, name, additionalInfo);
+	}
+
+	public IntegerButton(@NotNull AtomicInteger value, Integer minValue, Integer maxValue, @NotNull Material type,
+			@Nullable Consumer<AtomicInteger> postprocess, @NotNull String name, String @NotNull ... additionalInfo) {
 		super(() -> getItem(value, type, name, additionalInfo), event -> {
 			int diff;
 			switch (event.getClick()) {
@@ -58,42 +65,24 @@ public class IntegerButton extends Button {
 			if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
 				((SimpleUI) event.getView().getTopInventory().getHolder()).draw(event.getView().getTopInventory());
 			}
-		});
-		this.name = name;
-		this.value = value;
-	}
 
-	@Override
-	public @NotNull ItemStack getItem() {
-		ItemStack item = super.getItem();
-		ItemMeta itemMeta = item.getItemMeta();
-		if (itemMeta != null) {
-			String displayName = ChatColor.WHITE + name + ": " + ChatColor.GOLD + value.get();
-			if (itemMeta.hasDisplayName() && itemMeta.getDisplayName().equals(displayName)) {
-				return item;
+			if (postprocess != null) {
+				postprocess.accept(value);
 			}
-			itemMeta.setDisplayName(displayName);
-			item.setItemMeta(itemMeta);
-		}
-		return item;
+		});
 	}
 
-	private static ItemStack getItem(AtomicInteger value, Material type, String name, String... additionalInfo) {
-		ItemStack item = new ItemStack(type);
-		ItemMeta itemMeta = item.getItemMeta();
-		if (itemMeta != null) {
-			itemMeta.setDisplayName(ChatColor.WHITE + name + ": " + ChatColor.GOLD + value.get());
-			List<String> lore = new ArrayList<>();
-			lore.add(ChatColor.WHITE + "Left click: " + ChatColor.GOLD + "+1");
-			lore.add(ChatColor.WHITE + "Right click: " + ChatColor.GOLD + "-1");
-			lore.add(ChatColor.WHITE + "Shift+click: " + ChatColor.GOLD + "±10");
-			lore.add(ChatColor.WHITE + "Drop (default Q): " + ChatColor.GOLD + "+100");
-			lore.add(ChatColor.WHITE + "Drop stack (ctrl+Q): " + ChatColor.GOLD + "-100");
-			Collections.addAll(lore, additionalInfo);
-			itemMeta.setLore(lore);
-		}
-		item.setItemMeta(itemMeta);
-		return item;
+	private static @NotNull ItemStack getItem(@NotNull AtomicInteger value, @NotNull Material type,
+			@NotNull String name, String @NotNull ... additionalInfo) {
+		String[] newInfo = new String[6 + additionalInfo.length];
+		newInfo[0] = ChatColor.WHITE + name + ": " + ChatColor.GOLD + value.get();
+		newInfo[1] = ChatColor.WHITE + "Left click: " + ChatColor.GOLD + "+1";
+		newInfo[2] = ChatColor.WHITE + "Right click: " + ChatColor.GOLD + "-1";
+		newInfo[3] = ChatColor.WHITE + "Shift+click: " + ChatColor.GOLD + "±10";
+		newInfo[4] = ChatColor.WHITE + "Drop (default Q): " + ChatColor.GOLD + "+100";
+		newInfo[5] = ChatColor.WHITE + "Drop stack (ctrl+Q): " + ChatColor.GOLD + "-100";
+		System.arraycopy(additionalInfo, 0, newInfo, 6, additionalInfo.length);
+		return createIcon(type, newInfo);
 	}
 
 }

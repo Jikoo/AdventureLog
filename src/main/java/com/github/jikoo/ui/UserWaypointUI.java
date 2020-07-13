@@ -9,8 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class UserWaypointUI extends SimpleUI {
 
@@ -28,13 +26,7 @@ public class UserWaypointUI extends SimpleUI {
 			if (!target.isOnline() && !target.hasPlayedBefore()
 					|| (destination = target.getBedSpawnLocation()) == null
 					&& !plugin.getConfig().getBoolean("personal.respawn-point.default-to-spawn")) {
-				ItemStack itemStack = new ItemStack(Material.BARRIER);
-				ItemMeta itemMeta = itemStack.getItemMeta();
-				if (itemMeta != null) {
-					itemMeta.setDisplayName(ChatColor.RED + "No Respawn Point");
-					itemStack.setItemMeta(itemMeta);
-				}
-				addButton(new Button(itemStack, event -> event.setCancelled(true)));
+				addButton(new Button(Button.createIcon(Material.BARRIER, ChatColor.RED + "No Respawn Point"), event -> event.setCancelled(true)));
 			} else {
 				// TODO charge respawn anchor, ensure safe teleport
 				addButton(new TeleportButton(plugin, new SimpleWaypoint("Respawn Location", Material.RED_BED, () -> {
@@ -49,7 +41,23 @@ public class UserWaypointUI extends SimpleUI {
 		plugin.getDataManager().getUserData(owner).getUserWaypoints()
 				.forEach(waypoint -> addButton(new TeleportButton(plugin, waypoint)));
 
-		// TODO EditorUI (possibly shared with ManageWaypointsCommand) and navbar button
+		if (!viewer.getUniqueId().equals(owner)) {
+			if (!viewer.hasPermission("adventurelog.manage.other")) {
+				return;
+			}
+		} else if (plugin.getPermittedPersonalWarps(viewer) == 0) {
+			return;
+		}
+
+		setNavButton(2, new Button(
+				Button.createIcon(Material.WRITABLE_BOOK, ChatColor.DARK_PURPLE + "Open Editor"),
+				event -> {
+					event.setCancelled(true);
+					if (!(event.getWhoClicked() instanceof Player)) {
+						return;
+					}
+					event.getWhoClicked().openInventory(new WaypointEditorUI(plugin, owner, (Player) event.getWhoClicked()).getInventory());
+		}));
 
 	}
 

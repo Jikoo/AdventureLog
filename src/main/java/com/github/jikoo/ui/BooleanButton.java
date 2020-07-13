@@ -1,62 +1,40 @@
 package com.github.jikoo.ui;
 
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BooleanButton extends Button {
 
-	private final AtomicBoolean value;
-	private final Material materialTrue, materialFalse;
-	private final String name;
+	public BooleanButton(@NotNull AtomicBoolean value, @NotNull Material materialTrue, @NotNull Material materialFalse, @NotNull String name) {
+		this(value, materialTrue, materialFalse, null, name);
 
-	public BooleanButton(AtomicBoolean value, Material materialTrue, Material materialFalse, String name) {
+	}
+
+	public BooleanButton(@NotNull AtomicBoolean value, @NotNull Material materialTrue, @NotNull Material materialFalse,
+			@Nullable Consumer<AtomicBoolean> postprocess, @NotNull String name) {
 		super(() -> getItem(value, materialTrue, materialFalse, name), event -> {
 			value.set(!value.get());
 
 			if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
 				((SimpleUI) event.getView().getTopInventory().getHolder()).draw(event.getView().getTopInventory());
 			}
+
+			if (postprocess != null) {
+				postprocess.accept(value);
+			}
 		});
 
-		this.value = value;
-		this.materialTrue = materialTrue;
-		this.materialFalse = materialFalse;
-		this.name = name;
 	}
 
-	@Override
-	public @NotNull ItemStack getItem() {
-		ItemStack item = super.getItem();
-		Material expectedType = value.get() ? materialTrue : materialFalse;
-
-		if (item.getType() == expectedType) {
-			return item;
-		}
-
-		ItemMeta itemMeta = item.getItemMeta();
-		if (itemMeta != null) {
-			itemMeta.setDisplayName(ChatColor.WHITE + name + ": " + ChatColor.GOLD + value.get());
-		}
-		item.setType(expectedType);
-		item.setItemMeta(itemMeta);
-
-		return item;
-	}
-
-	private static ItemStack getItem(AtomicBoolean value, Material typeOn, Material typeOff, String name) {
-		ItemStack item = new ItemStack(value.get() ? typeOn : typeOff);
-		ItemMeta itemMeta = item.getItemMeta();
-		if (itemMeta != null) {
-			itemMeta.setDisplayName(ChatColor.WHITE + name + ": " + ChatColor.GOLD + value.get());
-			itemMeta.setLore(Collections.singletonList(ChatColor.WHITE + "Click to toggle"));
-		}
-		item.setItemMeta(itemMeta);
-		return item;
+	private static ItemStack getItem(@NotNull AtomicBoolean value, @NotNull Material typeOn, @NotNull Material typeOff,
+			@NotNull String name) {
+		return createIcon(value.get() ? typeOn : typeOff,
+				ChatColor.WHITE + name + ": " + ChatColor.GOLD + value.get(), ChatColor.WHITE + "Click to toggle");
 	}
 
 }

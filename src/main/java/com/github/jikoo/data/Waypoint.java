@@ -50,16 +50,7 @@ public class Waypoint extends YamlSubsetData implements IWaypoint {
 	}
 
 	public void setIcon(@NotNull ItemStack icon) {
-		this.set("icon", icon);
-	}
-
-	@Override
-	public int getPriority() {
-		return this.getInt("priority");
-	}
-
-	public void setPriority(int priority) {
-		this.set("priority", priority);
+		this.set("icon", icon.clone());
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package com.github.jikoo.data;
 
-import com.github.jikoo.DataManager;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -83,7 +82,7 @@ public class ServerData extends YamlData {
 	}
 
 	public @NotNull Collection<ServerWaypoint> getWaypoints() {
-		return this.loadedWaypoints.values().stream().sorted(DataManager.WAYPOINT_COMPARATOR).collect(Collectors.toList());
+		return this.loadedWaypoints.values().stream().sorted(ServerWaypoint.COMPARATOR).collect(Collectors.toList());
 	}
 
 	@NotNull Collection<String> getDefaultWaypointNames() {
@@ -92,7 +91,7 @@ public class ServerData extends YamlData {
 
 	public @NotNull Collection<ServerWaypoint> getDefaultWaypoints() {
 		return this.defaultWaypoints.stream().map(this::getWaypoint).filter(Objects::nonNull)
-				.sorted(DataManager.WAYPOINT_COMPARATOR).collect(Collectors.toList());
+				.sorted(ServerWaypoint.COMPARATOR).collect(Collectors.toList());
 	}
 
 	public BucketPartition<ServerWaypoint> next() {

@@ -1,11 +1,11 @@
 package com.github.jikoo.data;
 
+import com.github.jikoo.ui.Button;
 import java.util.function.Supplier;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 public class SimpleWaypoint implements IWaypoint {
@@ -20,12 +20,7 @@ public class SimpleWaypoint implements IWaypoint {
 
 	public SimpleWaypoint(@NotNull String name, @NotNull Material type, @NotNull Supplier<Location> location) {
 		this.name = name;
-		this.icon = new ItemStack(type);
-		ItemMeta itemMeta = this.icon.getItemMeta();
-		if (itemMeta != null) {
-			itemMeta.setDisplayName(ChatColor.GOLD + name);
-			icon.setItemMeta(itemMeta);
-		}
+		this.icon = Button.createIcon(type, ChatColor.GOLD + name);
 		if (!location.get().isWorldLoaded()) {
 			throw new IllegalStateException("SimpleWaypoint location's world must be loaded!");
 		}
@@ -48,11 +43,6 @@ public class SimpleWaypoint implements IWaypoint {
 			return this.icon;
 		}
 		return IWaypoint.super.getIcon();
-	}
-
-	@Override
-	public int getPriority() {
-		return Integer.MAX_VALUE;
 	}
 
 }

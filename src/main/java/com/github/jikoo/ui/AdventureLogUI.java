@@ -4,8 +4,6 @@ import com.github.jikoo.AdventureLogPlugin;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class AdventureLogUI extends SimpleUI {
 
@@ -21,16 +19,8 @@ public class AdventureLogUI extends SimpleUI {
 			return;
 		}
 
-		ItemStack itemStack = new ItemStack(Material.RED_BED);
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		if (itemMeta != null) {
-			itemMeta.setDisplayName(ChatColor.GOLD + "Personal Waypoints");
-
-			itemStack.setItemMeta(itemMeta);
-		}
-
-		setNavButton(2, new Button(itemStack, event ->
-				event.getWhoClicked().openInventory(new UserWaypointUI(plugin, viewer.getUniqueId(), viewer).getInventory())));
+		setNavButton(2, new Button(Button.createIcon(Material.RED_BED, ChatColor.GOLD + "Personal Waypoints"),
+				event -> event.getWhoClicked().openInventory(new UserWaypointUI(plugin, viewer.getUniqueId(), viewer).getInventory())));
 	}
 
 }

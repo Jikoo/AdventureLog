@@ -1,17 +1,28 @@
 package com.github.jikoo.data;
 
+import java.util.Comparator;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class ServerWaypoint extends Waypoint {
 
-	public ServerWaypoint(ServerData storage, String name, @NotNull ItemStack icon, @NotNull Location location) {
+	public static final Comparator<ServerWaypoint> COMPARATOR = Comparator.comparing(ServerWaypoint::getPriority).reversed();
+
+	ServerWaypoint(ServerData storage, String name, @NotNull ItemStack icon, @NotNull Location location) {
 		super(storage, name, icon, location);
 	}
 
-	public ServerWaypoint(ServerData storage, String name) {
+	ServerWaypoint(ServerData storage, String name) {
 		super(storage, name);
+	}
+
+	public int getPriority() {
+		return this.getInt("priority");
+	}
+
+	public void setPriority(int priority) {
+		this.set("priority", priority);
 	}
 
 	public long getRangeSquared() {
