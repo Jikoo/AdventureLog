@@ -2,6 +2,7 @@ package com.github.jikoo.ui.impl;
 
 import com.github.jikoo.AdventureLogPlugin;
 import com.github.jikoo.data.ServerWaypoint;
+import com.github.jikoo.data.UserData;
 import com.github.jikoo.data.UserWaypoint;
 import com.github.jikoo.data.Waypoint;
 import com.github.jikoo.ui.BooleanButton;
@@ -17,6 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -214,7 +216,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 
 	public static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull Class<? extends Waypoint> waypointClazz,
 			@Nullable Waypoint waypoint, @NotNull UUID owner) {
-		return new Button(() -> getIcon(waypointClazz, waypoint), event -> {
+		return new Button(() -> getIcon(plugin, waypointClazz, waypoint, owner), event -> {
 			ItemStack clicked = event.getCurrentItem();
 			if (clicked == null || clicked.getType().isAir()) {
 				return;
@@ -243,9 +245,28 @@ public class IndividualWaypointEditor extends SimpleUI {
 				clicked.setType(Material.AIR);
 				return;
 			}
+
+			// Action: Delete waypoint
 			if (event.getClick() == ClickType.CONTROL_DROP) {
 				waypoint.delete();
 				clicked.setType(Material.AIR);
+
+				if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
+					((SimpleUI) event.getView().getTopInventory().getHolder()).draw(event.getView().getTopInventory());
+				}
+				return;
+			}
+
+			// Action: Toggle unlock
+			if (event.getClick() == ClickType.SHIFT_RIGHT && waypoint instanceof ServerWaypoint) {
+				UserData userData = plugin.getDataManager().getUserData(owner);
+				List<String> unlocked = userData.getUnlocked();
+				if (unlocked.contains(waypoint.getName())) {
+					unlocked.remove(waypoint.getName());
+				} else {
+					unlocked.add(waypoint.getName());
+				}
+				userData.setUnlocked(unlocked);
 
 				if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
 					((SimpleUI) event.getView().getTopInventory().getHolder()).draw(event.getView().getTopInventory());
@@ -264,7 +285,8 @@ public class IndividualWaypointEditor extends SimpleUI {
 		});
 	}
 
-	private static ItemStack getIcon(@NotNull Class<? extends Waypoint> waypointClazz, @Nullable Waypoint waypoint) {
+	private static ItemStack getIcon(@NotNull AdventureLogPlugin plugin,
+			@NotNull Class<? extends Waypoint> waypointClazz, @Nullable Waypoint waypoint, @NotNull UUID owner) {
 		if (waypoint == null) {
 			if (UserWaypoint.class.equals(waypointClazz)) {
 				return ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Create New Waypoint");
@@ -290,11 +312,20 @@ public class IndividualWaypointEditor extends SimpleUI {
 			list.add(ChatColor.WHITE + "Discovery range: " + ChatColor.GOLD
 					+ (serverWaypoint.getRangeSquared() < 1 ? -1 : (int) Math.sqrt(serverWaypoint.getRangeSquared())));
 			list.add(ChatColor.WHITE + "Always Discovered: " + ChatColor.GOLD + serverWaypoint.isDefault());
+			list.add("");
+			list.add(ChatColor.WHITE + "Unlocked for " + getName(owner) + ": " + ChatColor.GOLD
+					+ plugin.getDataManager().getUserData(owner).getUnlocked().contains(waypoint.getName()));
+			list.add(ChatColor.GOLD + "  (Shift + Rclick to toggle)");
 		}
 		list.add("");
 		list.add(ChatColor.RED + "Drop stack to delete.");
 		list.add(ChatColor.RED + "  (Default CTRL+Q)");
 		return ItemUtil.insertText(waypoint.getIcon().clone(), list);
+	}
+
+	private static String getName(UUID uuid) {
+		String name = Bukkit.getOfflinePlayer(uuid).getName();
+		return name == null ? uuid.toString() : name;
 	}
 
 }
