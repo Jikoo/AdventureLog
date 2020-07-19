@@ -1,7 +1,7 @@
 package com.github.jikoo.commands;
 
 import com.github.jikoo.AdventureLogPlugin;
-import com.github.jikoo.ui.AdventureLogUI;
+import com.github.jikoo.ui.impl.ServerWaypointUI;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -45,7 +45,7 @@ public class OpenLogCommand implements TabExecutor {
 			target = player.getUniqueId();
 		}
 
-		player.openInventory(new AdventureLogUI(plugin, target, player).getInventory());
+		player.openInventory(new ServerWaypointUI(plugin, target, player).getInventory());
 		return true;
 	}
 

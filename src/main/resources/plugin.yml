@@ -27,11 +27,6 @@ commands:
     description: Open the Adventure Log interface.
     usage: /<command> [player]
     permission: adventurelog.openlog
-  managewaypoints:
-    aliases: [editwaypoints]
-    description: Manage Adventure Log waypoints
-    usage: /<command>
-    permission: adventurelog.managewaypoints
   unlocklogwaypoint:
     aliases: [unlockwaypoint]
     description: Unlock a new Adventure Log waypoint

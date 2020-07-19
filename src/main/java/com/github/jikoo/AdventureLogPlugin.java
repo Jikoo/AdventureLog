@@ -2,7 +2,6 @@ package com.github.jikoo;
 
 import com.github.jikoo.commands.GiveLogCommand;
 import com.github.jikoo.commands.ManageUnlockedWaypointsCommand;
-import com.github.jikoo.commands.ManageWaypointsCommand;
 import com.github.jikoo.commands.OpenLogCommand;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -56,7 +55,6 @@ public class AdventureLogPlugin extends JavaPlugin {
 
 		addExecutor("givelog", new GiveLogCommand(this));
 		addExecutor("openlog", new OpenLogCommand(this));
-		addExecutor("managewaypoints", new ManageWaypointsCommand(this));
 		TabExecutor executor = new ManageUnlockedWaypointsCommand(this);
 		addExecutor("unlocklogwaypoint", executor);
 		addExecutor("locklogwaypoint", executor);

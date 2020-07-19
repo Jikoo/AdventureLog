@@ -1,6 +1,6 @@
 package com.github.jikoo;
 
-import com.github.jikoo.ui.AdventureLogUI;
+import com.github.jikoo.ui.impl.ServerWaypointUI;
 import com.github.jikoo.ui.SimpleUI;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -58,7 +58,7 @@ public class AdventureLogListener implements Listener {
 		event.setUseInteractedBlock(Event.Result.DENY);
 		event.setUseItemInHand(Event.Result.DENY);
 
-		event.getPlayer().openInventory(new AdventureLogUI(plugin, event.getPlayer().getUniqueId(), event.getPlayer()).getInventory());
+		event.getPlayer().openInventory(new ServerWaypointUI(plugin, event.getPlayer().getUniqueId(), event.getPlayer()).getInventory());
 
 	}
 
