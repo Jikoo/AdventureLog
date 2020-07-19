@@ -81,7 +81,7 @@ public class IntegerButton extends Button {
 		newInfo[2] = ChatColor.WHITE + "Right click: " + ChatColor.GOLD + "-1";
 		newInfo[3] = ChatColor.WHITE + "Shift+click: " + ChatColor.GOLD + "±10";
 		newInfo[4] = ChatColor.WHITE + "Drop (default Q): " + ChatColor.GOLD + "+100";
-		newInfo[5] = ChatColor.WHITE + "Drop stack (ctrl+Q): " + ChatColor.GOLD + "-100";
+		newInfo[5] = ChatColor.WHITE + "Drop stack (Ctrl+Q): " + ChatColor.GOLD + "-100";
 		System.arraycopy(additionalInfo, 0, newInfo, 6, additionalInfo.length);
 		return ItemUtil.getItem(type, newInfo);
 	}

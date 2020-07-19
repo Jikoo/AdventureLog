@@ -116,7 +116,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 				if (serverWP != null) {
 					serverWP.setRange(value.get());
 				}
-			}, "Discovery Range", ChatColor.GOLD + "-1 = Disable discovery"));
+			}, "Discovery Range", ChatColor.GOLD + "0 = Disable discovery"));
 
 			// BUTTON: Set default discovered
 			defaultDiscovered = new AtomicBoolean(serverWP != null && serverWP.isDefault());
@@ -319,7 +319,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 		}
 		list.add("");
 		list.add(ChatColor.RED + "Drop stack to delete.");
-		list.add(ChatColor.RED + "  (Default CTRL+Q)");
+		list.add(ChatColor.RED + "  (Default Ctrl+Q)");
 		return ItemUtil.insertText(waypoint.getIcon().clone(), list);
 	}
 
