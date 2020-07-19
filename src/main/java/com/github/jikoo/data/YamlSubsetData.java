@@ -8,6 +8,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({"unused", "SameParameterValue"})
 public abstract class YamlSubsetData {
 
 	private final YamlData storage;

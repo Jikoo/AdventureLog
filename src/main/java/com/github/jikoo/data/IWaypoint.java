@@ -1,6 +1,6 @@
 package com.github.jikoo.data;
 
-import com.github.jikoo.ui.Button;
+import com.github.jikoo.util.ItemUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +13,7 @@ public interface IWaypoint {
 	@NotNull Location getLocation();
 
 	default @NotNull ItemStack getIcon() {
-		return Button.createIcon(Material.DIRT, getName(),
+		return ItemUtil.getItem(Material.DIRT, getName(),
 				"Something went wrong loading icon!", "Please enjoy this complimentary dirt.");
 	}
 

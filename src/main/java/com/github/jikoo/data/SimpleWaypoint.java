@@ -1,6 +1,6 @@
 package com.github.jikoo.data;
 
-import com.github.jikoo.ui.Button;
+import com.github.jikoo.util.ItemUtil;
 import java.util.function.Supplier;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -20,7 +20,7 @@ public class SimpleWaypoint implements IWaypoint {
 
 	public SimpleWaypoint(@NotNull String name, @NotNull Material type, @NotNull Supplier<Location> location) {
 		this.name = name;
-		this.icon = Button.createIcon(type, ChatColor.GOLD + name);
+		this.icon = ItemUtil.getItem(type, ChatColor.GOLD + name);
 		if (!location.get().isWorldLoaded()) {
 			throw new IllegalStateException("SimpleWaypoint location's world must be loaded!");
 		}

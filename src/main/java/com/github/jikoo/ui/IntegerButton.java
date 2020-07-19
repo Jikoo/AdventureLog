@@ -1,5 +1,6 @@
 package com.github.jikoo.ui;
 
+import com.github.jikoo.util.ItemUtil;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import org.bukkit.ChatColor;
@@ -82,7 +83,7 @@ public class IntegerButton extends Button {
 		newInfo[4] = ChatColor.WHITE + "Drop (default Q): " + ChatColor.GOLD + "+100";
 		newInfo[5] = ChatColor.WHITE + "Drop stack (ctrl+Q): " + ChatColor.GOLD + "-100";
 		System.arraycopy(additionalInfo, 0, newInfo, 6, additionalInfo.length);
-		return createIcon(type, newInfo);
+		return ItemUtil.getItem(type, newInfo);
 	}
 
 }

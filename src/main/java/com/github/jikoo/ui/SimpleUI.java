@@ -93,11 +93,14 @@ public class SimpleUI implements InventoryHolder {
 		navigation.put(2 + slot, button);
 	}
 
+	protected int getInventorySize() {
+		int highestIndex = buttons.size() > 0 ? buttons.lastKey() + 1 : 0;
+		return Math.min(54, Math.max(9, (int) Math.ceil(highestIndex / 9D) * 9 + (navigation.isEmpty() ? 0 : 9)));
+	}
+
 	@Override
 	public @NotNull Inventory getInventory() {
-		int highestIndex = buttons.size() > 0 ? buttons.lastKey() + 1 : 0;
-		int size = Math.min(54, Math.max(9, (int) Math.ceil(highestIndex / 9D) * 9 + (navigation.isEmpty() ? 0 : 9)));
-		Inventory inventory = Bukkit.createInventory(this, size, name);
+		Inventory inventory = Bukkit.createInventory(this, getInventorySize(), name);
 		draw(inventory);
 		return inventory;
 	}
@@ -183,7 +186,7 @@ public class SimpleUI implements InventoryHolder {
 				int highestRequiredButton = getHighestButton();
 				int maxPage = (int) Math.ceil(highestRequiredButton / 45D);
 				ItemStack itemStack;
-				if (highestCurrentButton > highestRequiredButton) {
+				if (highestCurrentButton < highestRequiredButton) {
 					itemStack = new ItemStack(Material.BLACK_BANNER);
 					ItemMeta itemMeta = itemStack.getItemMeta();
 					if (itemMeta instanceof BannerMeta) {

@@ -1,5 +1,6 @@
 package com.github.jikoo.ui;
 
+import com.github.jikoo.util.ItemUtil;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.bukkit.ChatColor;
@@ -12,7 +13,6 @@ public class BooleanButton extends Button {
 
 	public BooleanButton(@NotNull AtomicBoolean value, @NotNull Material materialTrue, @NotNull Material materialFalse, @NotNull String name) {
 		this(value, materialTrue, materialFalse, null, name);
-
 	}
 
 	public BooleanButton(@NotNull AtomicBoolean value, @NotNull Material materialTrue, @NotNull Material materialFalse,
@@ -33,7 +33,7 @@ public class BooleanButton extends Button {
 
 	private static ItemStack getItem(@NotNull AtomicBoolean value, @NotNull Material typeOn, @NotNull Material typeOff,
 			@NotNull String name) {
-		return createIcon(value.get() ? typeOn : typeOff,
+		return ItemUtil.getItem(value.get() ? typeOn : typeOff,
 				ChatColor.WHITE + name + ": " + ChatColor.GOLD + value.get(), ChatColor.WHITE + "Click to toggle");
 	}
 
