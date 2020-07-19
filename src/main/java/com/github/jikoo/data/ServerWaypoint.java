@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class ServerWaypoint extends Waypoint {
+public final class ServerWaypoint extends Waypoint {
 
 	public static final Comparator<ServerWaypoint> COMPARATOR = Comparator.comparing(ServerWaypoint::getPriority).reversed();
 

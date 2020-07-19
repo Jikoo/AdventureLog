@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.lucko.helper.bucket.Bucket;
-import me.lucko.helper.bucket.BucketPartition;
 import me.lucko.helper.bucket.factory.BucketFactory;
 import me.lucko.helper.bucket.partitioning.PartitioningStrategies;
 import org.bukkit.Location;
@@ -24,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public class ServerData extends YamlData {
 
 	private final Map<String, ServerWaypoint> loadedWaypoints;
-	private final Bucket<ServerWaypoint> discoverableWaypoints; // TODO -> name?
+	private final Bucket<String> discoverableWaypoints;
 	private final Set<String> defaultWaypoints;
 
 	public ServerData(@NotNull Plugin plugin) {
@@ -53,9 +52,7 @@ public class ServerData extends YamlData {
 				return;
 			}
 			loadedWaypoints.put(waypointName, loaded);
-			if (loaded.getRangeSquared() > 0) {
-				discoverableWaypoints.add(loaded);
-			}
+			this.notifyDefaultUpdate(loaded);
 		}
 	}
 
@@ -74,7 +71,10 @@ public class ServerData extends YamlData {
 			existing.setLocation(location);
 			return existing;
 		}
-		return new ServerWaypoint(this, name, icon, location);
+		ServerWaypoint waypoint = new ServerWaypoint(this, name, icon, location);
+		this.loadedWaypoints.put(name, waypoint);
+		notifyDefaultUpdate(waypoint);
+		return waypoint;
 	}
 
 	public @Nullable ServerWaypoint getWaypoint(@NotNull String name) {
@@ -94,28 +94,30 @@ public class ServerData extends YamlData {
 				.sorted(ServerWaypoint.COMPARATOR).collect(Collectors.toList());
 	}
 
-	public BucketPartition<ServerWaypoint> next() {
-		return this.discoverableWaypoints.asCycle().next();
+	public Collection<ServerWaypoint> next() {
+		// TODO implement own Bucket system, Helper includes tons of bloat
+		return this.discoverableWaypoints.asCycle().next().stream().map(this::getWaypoint)
+				.filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	void notifyRangeUpdate(@NotNull ServerWaypoint waypoint) {
 		if (waypoint.getRangeSquared() < 1) {
-			this.discoverableWaypoints.remove(waypoint);
+			this.discoverableWaypoints.remove(waypoint.getName());
 		}
 		if (this.defaultWaypoints.contains(waypoint.getName())) {
 			return;
 		}
-		this.discoverableWaypoints.add(waypoint);
+		this.discoverableWaypoints.add(waypoint.getName());
 	}
 
 	void notifyDefaultUpdate(@NotNull ServerWaypoint waypoint) {
 		if (waypoint.isDefault()) {
-			this.discoverableWaypoints.remove(waypoint);
+			this.discoverableWaypoints.remove(waypoint.getName());
 			this.defaultWaypoints.add(waypoint.getName());
 			return;
 		}
 		if (waypoint.getRangeSquared() > 0) {
-			this.discoverableWaypoints.add(waypoint);
+			this.discoverableWaypoints.add(waypoint.getName());
 		}
 		this.defaultWaypoints.remove(waypoint.getName());
 	}
@@ -123,7 +125,7 @@ public class ServerData extends YamlData {
 	void notifyDelete(@NotNull ServerWaypoint waypoint) {
 		this.loadedWaypoints.remove(waypoint.getName());
 		this.defaultWaypoints.remove(waypoint.getName());
-		this.discoverableWaypoints.remove(waypoint);
+		this.discoverableWaypoints.remove(waypoint.getName());
 	}
 
 }

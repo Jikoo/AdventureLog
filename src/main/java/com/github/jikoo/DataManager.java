@@ -6,9 +6,9 @@ import com.github.jikoo.data.UserData;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import me.lucko.helper.bucket.BucketPartition;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -33,9 +33,9 @@ public class DataManager {
 
 	private void startDiscovery() {
 		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-			BucketPartition<ServerWaypoint> partition = serverData.next();
+			Collection<ServerWaypoint> nextDiscoverySegment = serverData.next();
 
-			if (partition.isEmpty()) {
+			if (nextDiscoverySegment.isEmpty()) {
 				// Quick return for few waypoints
 				return;
 			}
@@ -44,7 +44,7 @@ public class DataManager {
 				if (discoveryBlocked(player)) {
 					continue;
 				}
-				for (ServerWaypoint waypoint : partition) {
+				for (ServerWaypoint waypoint : nextDiscoverySegment) {
 					if (waypoint.getRangeSquared() > -1 && player.getWorld().equals(waypoint.getLocation().getWorld())
 							&& player.getLocation().distanceSquared(waypoint.getLocation()) <= waypoint.getRangeSquared()
 							&& playerCache.getUnchecked(player.getUniqueId()).unlockWaypoint(waypoint.getName())) {
