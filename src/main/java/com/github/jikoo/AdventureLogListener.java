@@ -30,8 +30,23 @@ public class AdventureLogListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onInventoryDrag(@NotNull InventoryDragEvent event) {
-		if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
+		if (!(event.getView().getTopInventory().getHolder() instanceof SimpleUI)) {
+			return;
+		}
+
+		if (((SimpleUI) event.getView().getTopInventory().getHolder()).isActionBlocking()) {
 			event.setCancelled(true);
+			return;
+		}
+
+		int size = event.getView().getTopInventory().getSize();
+		for (int slot : event.getRawSlots()) {
+			// TODO: InventoryDragEvent#getRawSlots is mutable, InventoryDragEvent#getNewItems is not
+			//  - possible to remove top slots instead of cancelling? Needs testing
+			if (slot < size) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 	}
 
