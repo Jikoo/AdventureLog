@@ -67,8 +67,7 @@ public class Waypoint extends YamlSubsetData implements IWaypoint {
 			return false;
 		}
 		Waypoint other = (Waypoint) obj;
-		// TODO ensure backed by same YamlConfiguration
-		return name.equals(other.name);
+		return name.equals(other.name) && raw().raw().equals(other.raw().raw());
 	}
 
 	public boolean isInvalid() {

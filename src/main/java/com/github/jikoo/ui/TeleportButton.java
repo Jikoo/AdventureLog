@@ -3,6 +3,7 @@ package com.github.jikoo.ui;
 import com.github.jikoo.data.IWaypoint;
 import com.github.jikoo.util.DelayedTeleport;
 import com.github.jikoo.util.ItemUtil;
+import com.github.jikoo.util.TextUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -33,7 +34,7 @@ public class TeleportButton extends Button {
 	}
 
 	private static ItemStack getItem(IWaypoint waypoint) {
-		return ItemUtil.appendText(waypoint.getIcon().clone(), ChatColor.GOLD + "Click to teleport");
+		return ItemUtil.appendText(waypoint.getIcon().clone(), ChatColor.GOLD + TextUtil.getDisplay(waypoint.getLocation()), ChatColor.GOLD + "Click to teleport");
 	}
 
 }

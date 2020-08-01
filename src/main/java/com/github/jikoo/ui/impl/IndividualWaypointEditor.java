@@ -10,6 +10,7 @@ import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.IntegerButton;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.util.ItemUtil;
+import com.github.jikoo.util.TextUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,7 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationContext;
@@ -87,10 +87,12 @@ public class IndividualWaypointEditor extends SimpleUI {
 
 		// BUTTON: Set location
 		if (waypoint != null) {
-			addButton(new Button(ItemUtil.getItem(Material.ARMOR_STAND, ChatColor.GOLD + "Set Location",
-					ChatColor.WHITE + "Middle click to set", ChatColor.WHITE + "to current position."), event -> {
+			addButton(new Button(() -> ItemUtil.getItem(Material.ARMOR_STAND, ChatColor.GOLD + "Set Location",
+					ChatColor.WHITE + "Middle click to set", ChatColor.WHITE + "to current position.", "",
+					ChatColor.WHITE + "Current: " + ChatColor.GOLD + TextUtil.getDisplay(waypoint.getLocation())), event -> {
 				if (event.getClick() == ClickType.MIDDLE) {
 					waypoint.setLocation(event.getWhoClicked().getLocation());
+					draw(event.getView().getTopInventory());
 				}
 			}));
 		}
@@ -302,10 +304,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 
 		List<String> list = new ArrayList<>();
 		list.add(ChatColor.WHITE + "Edit waypoint: " + ChatColor.GOLD + waypoint.getName());
-		Location location = waypoint.getLocation();
-		list.add(ChatColor.WHITE + "Location: " + ChatColor.GOLD + String.format("%s: %sx, %sy, %sz",
-				location.getWorld() == null ? "invalid_world" : location.getWorld().getName(),
-				location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+		list.add(ChatColor.GOLD + TextUtil.getDisplay(waypoint.getLocation()));
 		if (waypoint instanceof ServerWaypoint) {
 			ServerWaypoint serverWaypoint = (ServerWaypoint) waypoint;
 			list.add(ChatColor.WHITE + "Priority: " + ChatColor.GOLD + serverWaypoint.getPriority());

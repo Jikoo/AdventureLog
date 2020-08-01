@@ -1,5 +1,6 @@
 package com.github.jikoo.data;
 
+import com.github.jikoo.util.TextUtil;
 import java.util.ArrayList;
 import java.util.List;
 import net.md_5.bungee.api.ChatColor;
@@ -57,8 +58,7 @@ public class UserWaypoint extends Waypoint {
 		}
 
 		this.set("custom_name", displayName);
-		// TODO double check - stripColor appears to only consider upper case color codes while translate etc. create lower
-		this.set("comparable_name", displayName == null ? null : ChatColor.stripColor(displayName.toUpperCase()));
+		this.set("comparable_name", displayName == null ? null : TextUtil.stripColor(displayName.toUpperCase()));
 	}
 
 	@Override
