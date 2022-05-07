@@ -1,13 +1,5 @@
 package com.github.jikoo.ui;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -20,8 +12,17 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.function.Consumer;
 
 public class SimpleUI implements InventoryHolder {
 
@@ -88,7 +89,7 @@ public class SimpleUI implements InventoryHolder {
 
 	public void setNavButton(int slot, @Nullable Button button) {
 		if (slot < 0 || slot > 4) {
-			throw new IllegalArgumentException("Additional navigation buttons may only occupy indexes 0-4!");
+			throw new IllegalArgumentException("Additional navigation buttons may only occupy indices 0-4!");
 		}
 		navigation.put(2 + slot, button);
 	}
@@ -115,137 +116,16 @@ public class SimpleUI implements InventoryHolder {
 
 		if (contents.length == 54) {
 			// First page button
-			navigation.put(0, ((Supplier<Button>) () -> {
-				int maxPage = (int) Math.ceil(getHighestButton() / 45D);
-				ItemStack itemStack;
-				Consumer<InventoryClickEvent> consumer;
-				if (startIndex > 0) {
-					itemStack = new ItemStack(Material.BLACK_BANNER);
-					ItemMeta itemMeta = itemStack.getItemMeta();
-					if (itemMeta instanceof BannerMeta) {
-						BannerMeta bannerMeta = (BannerMeta) itemMeta;
-						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT));
-						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT_MIRROR));
-						bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_LEFT));
-						itemStack.setItemMeta(itemMeta);
-					}
-					consumer = event -> {
-						startIndex = 0;
-						draw(event.getView().getTopInventory());
-					};
-				} else {
-					itemStack = new ItemStack(Material.BARRIER);
-					consumer = event -> {
-					};
-				}
-				ItemMeta itemMeta = itemStack.getItemMeta();
-				if (itemMeta != null) {
-					itemMeta.setDisplayName(ChatColor.WHITE + "First Page");
-					itemMeta.setLore(Collections.singletonList(ChatColor.GOLD + "  1/" + maxPage));
-					itemStack.setItemMeta(itemMeta);
-				}
-				return new Button(itemStack, consumer);
-			}).get());
+			navigation.put(0, getNavFirstPage());
 
 			// Previous page button
-			navigation.put(1, ((Supplier<Button>) () -> {
-				int maxPage = (int) Math.ceil(getHighestButton() / 45D);
-				ItemStack itemStack;
-				if (startIndex > 0) {
-					itemStack = new ItemStack(Material.BLACK_BANNER);
-					ItemMeta itemMeta = itemStack.getItemMeta();
-					if (itemMeta instanceof BannerMeta) {
-						BannerMeta bannerMeta = (BannerMeta) itemMeta;
-						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT));
-						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT_MIRROR));
-					}
-					if (itemMeta != null) {
-						itemMeta.setDisplayName(ChatColor.WHITE + "Previous Page");
-						itemMeta.setLore(Collections.singletonList(ChatColor.GOLD + "  " + (startIndex / 45) + '/' + maxPage));
-						itemStack.setItemMeta(itemMeta);
-					}
-					return new Button(itemStack, event -> {
-						startIndex -= 45;
-						draw(event.getView().getTopInventory());
-					});
-				} else {
-					itemStack = new ItemStack(Material.BARRIER);
-					ItemMeta itemMeta = itemStack.getItemMeta();
-					if (itemMeta != null) {
-						itemMeta.setDisplayName(ChatColor.WHITE + "First Page");
-						itemMeta.setLore(Collections.singletonList(ChatColor.GOLD + "  1/" + maxPage));
-						itemStack.setItemMeta(itemMeta);
-					}
-					return new Button(itemStack, event -> {});
-				}
-			}).get());
+			navigation.put(1, getNavPreviousPage());
 
 			// Next page button
-			navigation.put(7, ((Supplier<Button>) () -> {
-				int highestCurrentButton = startIndex + 44;
-				int highestRequiredButton = getHighestButton();
-				int maxPage = (int) Math.ceil(highestRequiredButton / 45D);
-				ItemStack itemStack;
-				if (highestCurrentButton < highestRequiredButton) {
-					itemStack = new ItemStack(Material.BLACK_BANNER);
-					ItemMeta itemMeta = itemStack.getItemMeta();
-					if (itemMeta instanceof BannerMeta) {
-						BannerMeta bannerMeta = (BannerMeta) itemMeta;
-						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT));
-						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT_MIRROR));
-					}
-					if (itemMeta != null) {
-						itemMeta.setDisplayName(ChatColor.WHITE + "Next Page");
-						itemMeta.setLore(Collections.singletonList(ChatColor.GOLD + "  " + (startIndex / 45 + 2) + '/' + maxPage));
-						itemStack.setItemMeta(itemMeta);
-					}
-					return new Button(itemStack, event -> {
-						startIndex += 45;
-						draw(event.getView().getTopInventory());
-					});
-				} else {
-					itemStack = new ItemStack(Material.BARRIER);
-					ItemMeta itemMeta = itemStack.getItemMeta();
-					if (itemMeta != null) {
-						itemMeta.setDisplayName(ChatColor.WHITE + "Last Page");
-						itemMeta.setLore(Collections.singletonList(ChatColor.GOLD + "  " + maxPage + '/' + maxPage));
-						itemStack.setItemMeta(itemMeta);
-					}
-					return new Button(itemStack, event -> {});
-				}
-			}).get());
+			navigation.put(7, getNavNextPage());
 
 			// Last page button
-			navigation.put(8, ((Supplier<Button>) () -> {
-				int maxPage = (int) Math.ceil(getHighestButton() / 45D);
-				ItemStack itemStack;
-				Consumer<InventoryClickEvent> consumer;
-				if (startIndex > 0) {
-					itemStack = new ItemStack(Material.BLACK_BANNER);
-					ItemMeta itemMeta = itemStack.getItemMeta();
-					if (itemMeta instanceof BannerMeta) {
-						BannerMeta bannerMeta = (BannerMeta) itemMeta;
-						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT));
-						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT_MIRROR));
-						bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_RIGHT));
-						itemStack.setItemMeta(itemMeta);
-					}
-					consumer = event -> {
-						startIndex = 45 * maxPage - 45;
-						draw(event.getView().getTopInventory());
-					};
-				} else {
-					itemStack = new ItemStack(Material.BARRIER);
-					consumer = event -> {};
-				}
-				ItemMeta itemMeta = itemStack.getItemMeta();
-				if (itemMeta != null) {
-					itemMeta.setDisplayName(ChatColor.WHITE + "Last Page");
-					itemMeta.setLore(Collections.singletonList(ChatColor.GOLD + "  " + maxPage + '/' + maxPage));
-					itemStack.setItemMeta(itemMeta);
-				}
-				return new Button(itemStack, consumer);
-			}).get());
+			navigation.put(8, getNavLastPage());
 		}
 		if (!navigation.isEmpty()) {
 			int navStart = contents.length - 9;
@@ -253,6 +133,134 @@ public class SimpleUI implements InventoryHolder {
 		}
 
 		inventory.setContents(contents);
+	}
+
+	@NotNull
+	private Button getNavFirstPage() {
+		int maxPage = (int) Math.ceil(getHighestButton() / 45D);
+		String navName = "First Page";
+		String navIndex = getNavIndex(1, maxPage);
+
+		if (startIndex <= 0) {
+			return getNavDisabled(navName, navIndex);
+		}
+
+		return getNav(
+				navName,
+				navIndex,
+				event -> {
+					startIndex = 0;
+					draw(event.getView().getTopInventory());
+				},
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT),
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT_MIRROR),
+				new Pattern(DyeColor.BLACK, PatternType.STRIPE_LEFT)
+		);
+	}
+
+	private @NotNull Button getNavPreviousPage() {
+		int maxPage = (int) Math.ceil(getHighestButton() / 45D);
+		String navIndex = getNavIndex(Math.max(1, startIndex / 45), maxPage);
+
+		if (startIndex <= 0) {
+			return getNavDisabled("First Page", navIndex);
+		}
+
+		return getNav(
+				"Previous Page",
+				navIndex,
+				event -> {
+					startIndex -= 45;
+					draw(event.getView().getTopInventory());
+				},
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT),
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT_MIRROR)
+		);
+	}
+
+	private @NotNull Button getNavNextPage() {
+		int highestCurrentButton = startIndex + 44;
+		int highestButton = getHighestButton();
+		int maxPage = (int) Math.ceil(highestButton / 45D);
+		int nextPage = Math.min(startIndex / 45 + 2, maxPage);
+		String navIndex = getNavIndex(nextPage, maxPage);
+
+		if (highestCurrentButton >= highestButton) {
+			return getNavDisabled("Last Page", navIndex);
+		}
+
+		return getNav(
+				"Next Page",
+				navIndex,
+				event -> {
+					startIndex += 45;
+					draw(event.getView().getTopInventory());
+				},
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT),
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT_MIRROR)
+		);
+	}
+
+	private @NotNull Button getNavLastPage() {
+		int highestCurrentButton = startIndex + 44;
+		int highestButton = getHighestButton();
+		int maxPage = (int) Math.ceil(highestButton / 45D);
+		String navName = "Last Page";
+		String navIndex = getNavIndex(maxPage, maxPage);
+
+		if (highestCurrentButton >= highestButton) {
+			return getNavDisabled(navName, navIndex);
+		}
+
+		return getNav(
+				navName,
+				navIndex,
+				event -> {
+					startIndex = 45 * maxPage - 45;
+					draw(event.getView().getTopInventory());
+				},
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT),
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT_MIRROR),
+				new Pattern(DyeColor.BLACK, PatternType.STRIPE_RIGHT));
+	}
+
+	@Contract(pure = true)
+	private @NotNull String getNavName(@NotNull String name) {
+		return ChatColor.WHITE + name;
+	}
+
+	@Contract(pure = true)
+	private @NotNull String getNavIndex(int pageNumber, int maxPageNumber) {
+		return ChatColor.GOLD + "  " + pageNumber + '/' + maxPageNumber;
+	}
+
+	private @NotNull Button getNav(
+			@NotNull String name,
+			@NotNull String index,
+			@NotNull Consumer<InventoryClickEvent> consumer,
+			@NotNull Pattern... patterns) {
+		ItemStack itemStack = new ItemStack(Material.BLACK_BANNER);
+		ItemMeta itemMeta = itemStack.getItemMeta();
+
+		if (itemMeta instanceof BannerMeta bannerMeta) {
+			bannerMeta.setPatterns(List.of(patterns));
+			bannerMeta.setDisplayName(getNavName(name));
+			bannerMeta.setLore(List.of(index));
+			itemStack.setItemMeta(itemMeta);
+		}
+
+		return new Button(itemStack, consumer);
+	}
+
+	private @NotNull Button getNavDisabled(@NotNull String name, @NotNull String index) {
+		ItemStack itemStack = new ItemStack(Material.BARRIER);
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		if (itemMeta != null) {
+			itemMeta.setDisplayName(getNavName(name));
+			itemMeta.setLore(List.of(index));
+			itemStack.setItemMeta(itemMeta);
+		}
+		return new Button(itemStack, event -> {});
 	}
 
 }

@@ -1,11 +1,12 @@
 package com.github.jikoo.data;
 
 import com.google.common.base.Preconditions;
-import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 public class Waypoint extends YamlSubsetData implements IWaypoint {
 
@@ -63,10 +64,9 @@ public class Waypoint extends YamlSubsetData implements IWaypoint {
 		if (obj == this) {
 			return true;
 		}
-		if (!(obj instanceof Waypoint)) {
+		if (!(obj instanceof Waypoint other)) {
 			return false;
 		}
-		Waypoint other = (Waypoint) obj;
 		return name.equals(other.name) && raw().raw().equals(other.raw().raw());
 	}
 

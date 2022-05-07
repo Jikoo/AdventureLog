@@ -45,8 +45,7 @@ public class AdventureLogPlugin extends JavaPlugin {
 		waypointBook = new ItemStack(Material.KNOWLEDGE_BOOK);
 		ItemMeta itemMeta = waypointBook.getItemMeta();
 
-		if (itemMeta instanceof KnowledgeBookMeta) {
-			KnowledgeBookMeta bookMeta = (KnowledgeBookMeta) itemMeta;
+		if (itemMeta instanceof KnowledgeBookMeta bookMeta) {
 			bookMeta.setDisplayName(ChatColor.DARK_PURPLE + "Adventure Log");
 			bookMeta.addRecipe(waypointRecipeKey);
 			waypointBook.setItemMeta(bookMeta);

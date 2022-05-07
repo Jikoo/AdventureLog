@@ -1,11 +1,12 @@
 package com.github.jikoo.ui;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class Button {
 

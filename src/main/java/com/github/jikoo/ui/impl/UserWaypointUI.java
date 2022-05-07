@@ -6,7 +6,6 @@ import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.ui.TeleportButton;
 import com.github.jikoo.util.ItemUtil;
-import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,6 +14,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class UserWaypointUI extends SimpleUI {
 
@@ -75,8 +76,7 @@ public class UserWaypointUI extends SimpleUI {
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(ItemUtil.getItem(Material.RED_BED, ChatColor.GOLD + "Personal Waypoints"), event -> {
-			if (event.getWhoClicked() instanceof Player) {
-				Player player = (Player) event.getWhoClicked();
+			if (event.getWhoClicked() instanceof Player player) {
 				player.openInventory(new UserWaypointUI(plugin, owner, player).getInventory());
 			}
 		});

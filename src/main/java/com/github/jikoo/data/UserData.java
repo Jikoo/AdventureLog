@@ -1,5 +1,10 @@
 package com.github.jikoo.data;
 
+import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Comparator;
@@ -11,10 +16,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 
 public class UserData extends YamlData {
 

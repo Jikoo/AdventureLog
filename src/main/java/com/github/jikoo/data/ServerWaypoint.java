@@ -1,9 +1,10 @@
 package com.github.jikoo.data;
 
-import java.util.Comparator;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Comparator;
 
 public final class ServerWaypoint extends Waypoint {
 

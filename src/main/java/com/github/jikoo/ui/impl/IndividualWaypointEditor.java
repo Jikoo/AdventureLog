@@ -11,13 +11,6 @@ import com.github.jikoo.ui.IntegerButton;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.util.ItemUtil;
 import com.github.jikoo.util.TextUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -32,6 +25,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class IndividualWaypointEditor extends SimpleUI {
 
@@ -148,12 +149,12 @@ public class IndividualWaypointEditor extends SimpleUI {
 			return finalizeItem;
 		}, event -> {
 			if (waypoint != null) {
-				if (!(event.getWhoClicked() instanceof Player)) {
+				if (!(event.getWhoClicked() instanceof Player player)) {
 					event.getWhoClicked().closeInventory();
 					return;
 				}
-				Player player = (Player) event.getWhoClicked();
-				SimpleUI ui = UserWaypoint.class.isAssignableFrom(waypointClazz) ? new UserWaypointEditor(plugin, owner, player)
+				SimpleUI ui = UserWaypoint.class.isAssignableFrom(waypointClazz)
+						? new UserWaypointEditor(plugin, owner, player)
 						: new ServerWaypointEditor(plugin, owner, player);
 				player.openInventory(ui.getInventory());
 				return;
@@ -185,7 +186,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 			@Nullable
 			@Override
 			public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
-				if (input == null || !input.matches("[a-z_0-9]+")) {
+				if (input == null || !input.matches("[a-z_\\d]+")) {
 					return this;
 				}
 				if (plugin.getDataManager().getServerData().getWaypoint(input) != null) {
@@ -226,12 +227,10 @@ public class IndividualWaypointEditor extends SimpleUI {
 
 			if (waypoint == null) {
 
-				if (!(event.getWhoClicked() instanceof Player)) {
+				if (!(event.getWhoClicked() instanceof Player player)) {
 					event.getWhoClicked().closeInventory();
 					return;
 				}
-
-				Player player = (Player) event.getWhoClicked();
 
 				if (waypointClazz.equals(UserWaypoint.class)) {
 					UserWaypoint created = plugin.getDataManager().getUserData(owner).createWaypoint(event.getWhoClicked().getLocation());
@@ -305,8 +304,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 		List<String> list = new ArrayList<>();
 		list.add(ChatColor.WHITE + "Edit waypoint: " + ChatColor.GOLD + waypoint.getName());
 		list.add(ChatColor.GOLD + TextUtil.getDisplay(waypoint.getLocation()));
-		if (waypoint instanceof ServerWaypoint) {
-			ServerWaypoint serverWaypoint = (ServerWaypoint) waypoint;
+		if (waypoint instanceof ServerWaypoint serverWaypoint) {
 			list.add(ChatColor.WHITE + "Priority: " + ChatColor.GOLD + serverWaypoint.getPriority());
 			list.add(ChatColor.WHITE + "Discovery range: " + ChatColor.GOLD
 					+ (serverWaypoint.getRangeSquared() < 1 ? -1 : (int) Math.sqrt(serverWaypoint.getRangeSquared())));

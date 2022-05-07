@@ -19,10 +19,9 @@ public class TeleportButton extends Button {
 	public TeleportButton(@NotNull Plugin plugin, @NotNull IWaypoint waypoint) {
 		super(getItem(waypoint), event -> {
 			Bukkit.getScheduler().runTask(plugin, () -> event.getWhoClicked().closeInventory());
-			if (!(event.getWhoClicked() instanceof Player)) {
+			if (!(event.getWhoClicked() instanceof Player player)) {
 				return;
 			}
-			Player player = (Player) event.getWhoClicked();
 			Location destination = waypoint.getLocation();
 			if (!destination.isWorldLoaded()) {
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("World not loaded!", ChatColor.RED));

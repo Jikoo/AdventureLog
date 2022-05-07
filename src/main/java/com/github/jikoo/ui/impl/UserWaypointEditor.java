@@ -5,11 +5,12 @@ import com.github.jikoo.data.UserWaypoint;
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.util.ItemUtil;
-import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class UserWaypointEditor extends SimpleUI {
 
@@ -20,8 +21,7 @@ public class UserWaypointEditor extends SimpleUI {
 				addButton(IndividualWaypointEditor.getButton(plugin, UserWaypoint.class, waypoint, owner)));
 
 		setNavButton(1, new Button(plugin.getWaypointBook(), event -> {
-			if (event.getWhoClicked() instanceof Player) {
-				Player player = (Player) event.getWhoClicked();
+			if (event.getWhoClicked() instanceof Player player) {
 				player.openInventory(new ServerWaypointUI(plugin, player.getUniqueId(), player).getInventory());
 			}
 		}));
@@ -50,8 +50,7 @@ public class UserWaypointEditor extends SimpleUI {
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Edit Personal Waypoints"), event -> {
-			if (event.getWhoClicked() instanceof Player) {
-				Player player = (Player) event.getWhoClicked();
+			if (event.getWhoClicked() instanceof Player player) {
 				player.openInventory(new UserWaypointEditor(plugin, owner, player).getInventory());
 			}
 		});

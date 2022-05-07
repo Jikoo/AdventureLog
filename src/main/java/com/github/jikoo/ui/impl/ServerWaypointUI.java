@@ -5,11 +5,12 @@ import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.ui.TeleportButton;
 import com.github.jikoo.util.ItemUtil;
-import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class ServerWaypointUI extends SimpleUI {
 
@@ -33,8 +34,7 @@ public class ServerWaypointUI extends SimpleUI {
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(ItemUtil.getItem(Material.KNOWLEDGE_BOOK, ChatColor.GOLD + "Server Waypoints"), event -> {
-			if (event.getWhoClicked() instanceof Player) {
-				Player player = (Player) event.getWhoClicked();
+			if (event.getWhoClicked() instanceof Player player) {
 				player.openInventory(new ServerWaypointUI(plugin, owner, player).getInventory());
 			}
 		});

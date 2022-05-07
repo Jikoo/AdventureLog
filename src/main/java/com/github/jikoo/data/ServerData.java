@@ -1,5 +1,15 @@
 package com.github.jikoo.data;
 
+import me.lucko.helper.bucket.Bucket;
+import me.lucko.helper.bucket.factory.BucketFactory;
+import me.lucko.helper.bucket.partitioning.PartitioningStrategies;
+import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,15 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import me.lucko.helper.bucket.Bucket;
-import me.lucko.helper.bucket.factory.BucketFactory;
-import me.lucko.helper.bucket.partitioning.PartitioningStrategies;
-import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class ServerData extends YamlData {
 

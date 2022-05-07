@@ -13,8 +13,11 @@ public interface IWaypoint {
 	@NotNull Location getLocation();
 
 	default @NotNull ItemStack getIcon() {
-		return ItemUtil.getItem(Material.DIRT, getName(),
-				"Something went wrong loading icon!", "Please enjoy this complimentary dirt.");
+		return ItemUtil.getItem(
+				Material.DIRT,
+				getName(),
+				"Something went wrong loading icon!",
+				"Please enjoy this complimentary dirt.");
 	}
 
 }

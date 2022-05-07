@@ -2,9 +2,6 @@ package com.github.jikoo.commands;
 
 import com.github.jikoo.AdventureLogPlugin;
 import com.github.jikoo.ui.impl.ServerWaypointUI;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -12,6 +9,10 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class OpenLogCommand implements TabExecutor {
 
@@ -24,10 +25,9 @@ public class OpenLogCommand implements TabExecutor {
 	@Override
 	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
 			@NotNull String[] args) {
-		if (!(sender instanceof Player)) {
+		if (!(sender instanceof Player player)) {
 			return true;
 		}
-		Player player = (Player) sender;
 		UUID target;
 		if (sender.hasPermission("adventurelog.view.other") && args.length > 0) {
 			try {

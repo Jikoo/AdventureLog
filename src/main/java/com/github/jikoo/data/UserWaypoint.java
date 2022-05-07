@@ -1,14 +1,15 @@
 package com.github.jikoo.data;
 
 import com.github.jikoo.util.TextUtil;
-import java.util.ArrayList;
-import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserWaypoint extends Waypoint {
 

@@ -1,12 +1,13 @@
 package com.github.jikoo.data;
 
-import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 @SuppressWarnings({"unused", "SameParameterValue"})
 public abstract class YamlSubsetData {

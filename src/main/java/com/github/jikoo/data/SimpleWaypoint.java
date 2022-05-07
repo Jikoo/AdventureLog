@@ -1,12 +1,13 @@
 package com.github.jikoo.data;
 
 import com.github.jikoo.util.ItemUtil;
-import java.util.function.Supplier;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Supplier;
 
 public class SimpleWaypoint implements IWaypoint {
 

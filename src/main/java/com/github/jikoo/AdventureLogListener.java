@@ -1,7 +1,7 @@
 package com.github.jikoo;
 
-import com.github.jikoo.ui.impl.ServerWaypointUI;
 import com.github.jikoo.ui.SimpleUI;
+import com.github.jikoo.ui.impl.ServerWaypointUI;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
