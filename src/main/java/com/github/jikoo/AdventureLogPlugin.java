@@ -4,9 +4,6 @@ import com.github.jikoo.commands.GiveLogCommand;
 import com.github.jikoo.commands.ManageUnlockedWaypointsCommand;
 import com.github.jikoo.commands.OpenLogCommand;
 import com.google.common.collect.ImmutableList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -24,6 +21,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class AdventureLogPlugin extends JavaPlugin {
 
@@ -58,6 +59,11 @@ public class AdventureLogPlugin extends JavaPlugin {
 		TabExecutor executor = new ManageUnlockedWaypointsCommand(this);
 		addExecutor("unlocklogwaypoint", executor);
 		addExecutor("locklogwaypoint", executor);
+	}
+
+	@Override
+	public void onDisable() {
+		this.dataManager.save();
 	}
 
 	private void addExecutor(String command, TabExecutor tabExecutor) {

@@ -6,12 +6,15 @@ import com.github.jikoo.data.UserData;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class DataManager {
 
@@ -22,13 +25,31 @@ public class DataManager {
 	DataManager(AdventureLogPlugin plugin) {
 		this.plugin = plugin;
 		this.serverData = new ServerData(plugin);
-		this.playerCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(CacheLoader.from(uuid -> {
-			if (uuid == null) {
-				throw new NullPointerException("UUID cannot be null!");
-			}
-			return new UserData(plugin, uuid, () -> serverData);
-		}));
+		this.playerCache = CacheBuilder.newBuilder()
+				.expireAfterAccess(5, TimeUnit.MINUTES)
+				.build(CacheLoader.from(uuid -> {
+					if (uuid == null) {
+						throw new NullPointerException("UUID cannot be null!");
+					}
+					return new UserData(plugin, uuid, () -> serverData);
+				}));
 		startDiscovery();
+	}
+
+	void save() {
+		this.playerCache.asMap().forEach((key, value) -> {
+			try {
+				value.forceSave();
+			} catch (IOException exception) {
+				plugin.getLogger().log(Level.WARNING, exception, () -> String.format("Could not save data for %s", key));
+			}
+		});
+
+		try {
+			this.serverData.forceSave();
+		} catch (IOException exception) {
+			plugin.getLogger().log(Level.WARNING, "Could not save waypoint data", exception);
+		}
 	}
 
 	private void startDiscovery() {

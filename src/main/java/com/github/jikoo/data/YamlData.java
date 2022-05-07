@@ -1,9 +1,7 @@
 package com.github.jikoo.data;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
+import com.google.common.base.Charsets;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -15,13 +13,24 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+
 public abstract class YamlData {
 
 	private final Plugin plugin;
 	private final File file;
 	private final YamlConfiguration storage;
 	private boolean dirty = false;
-	private BukkitTask saveTask;
+	private @Nullable BukkitTask saveTask;
 
 	public YamlData(Plugin plugin, File file) {
 		this.plugin = plugin;
@@ -67,11 +76,11 @@ public abstract class YamlData {
 		return this.storage.getStringList(path);
 	}
 
-	<T> @Nullable T getObject(@NotNull String path, @NotNull Class<T> clazz) {
+	@Nullable <T> T getObject(@NotNull String path, @NotNull Class<T> clazz) {
 		return this.storage.getObject(path, clazz);
 	}
 
-	<T extends ConfigurationSerializable> @Nullable T getSerializable(@NotNull String path, @NotNull Class<T> clazz) {
+	@Nullable <T extends ConfigurationSerializable> T getSerializable(@NotNull String path, @NotNull Class<T> clazz) {
 		return this.storage.getSerializable(path, clazz);
 	}
 
@@ -91,37 +100,47 @@ public abstract class YamlData {
 		return this.storage;
 	}
 
-	void save() {
-		if (saveTask != null || !dirty) {
+	public void forceSave() throws IOException {
+		if (this.saveTask != null) {
+			this.saveTask.cancel();
+			this.saveTask = null;
+		}
+		saveNow();
+	}
+
+	private void save() {
+		if (this.saveTask != null || !this.dirty) {
 			return;
 		}
 		try {
 			saveTask = new BukkitRunnable() {
 				@Override
 				public void run() {
+					saveTask = null;
 					try {
 						saveNow();
 					} catch (IOException e) {
-						e.printStackTrace();
+						YamlData.this.plugin.getLogger().log(Level.WARNING, "Failed to save data", e);
 					}
 				}
 
 				@Override
 				public synchronized void cancel() throws IllegalStateException {
-					super.cancel();
+					saveTask = null;
 					try {
 						saveNow();
 					} catch (IOException e) {
-						e.printStackTrace();
+						YamlData.this.plugin.getLogger().log(Level.WARNING, "Failed to save data", e);
 					}
+					super.cancel();
 				}
-			}.runTaskLater(plugin, 200L);
-		} catch (IllegalStateException e) {
+			}.runTaskLaterAsynchronously(plugin, 200L);
+		} catch (IllegalStateException illegalState) {
 			// Plugin is being disabled, cannot schedule tasks
 			try {
 				saveNow();
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
+			} catch (IOException io) {
+				this.plugin.getLogger().log(Level.WARNING, "Failed to save data", io);
 			}
 		}
 	}
@@ -131,7 +150,24 @@ public abstract class YamlData {
 			return;
 		}
 
-		this.storage.save(this.file);
+		String data;
+		if (Bukkit.isPrimaryThread()) {
+			data = this.storage.saveToString();
+		} else {
+			try {
+				data = this.plugin.getServer().getScheduler().callSyncMethod(this.plugin, this.storage::saveToString).get();
+			} catch (InterruptedException | ExecutionException e) {
+				// Likely that plugin is being disabled and task was already scheduled.
+				data = this.storage.saveToString();
+			}
+		}
+
+		Files.createDirectories(this.file.toPath().getParent());
+
+		try (Writer writer = new OutputStreamWriter(new FileOutputStream(this.file), Charsets.UTF_8)) {
+			writer.write(data);
+		}
+
 		this.dirty = false;
 	}
 
