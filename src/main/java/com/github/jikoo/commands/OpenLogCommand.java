@@ -28,24 +28,30 @@ public class OpenLogCommand implements TabExecutor {
 		if (!(sender instanceof Player player)) {
 			return true;
 		}
-		UUID target;
-		if (sender.hasPermission("adventurelog.view.other") && args.length > 0) {
-			try {
-				target = UUID.fromString(args[0]);
-			} catch (IllegalArgumentException e) {
-				OfflinePlayer offline = plugin.getServer().getOfflinePlayer(args[0]);
-
-				if (!offline.isOnline() && !offline.hasPlayedBefore()) {
-					sender.sendMessage("Invalid recipient!");
-					return true;
-				}
-				target = offline.getUniqueId();
-			}
-		} else {
-			target = player.getUniqueId();
+		if (!sender.hasPermission("adventurelog.view.other") || args.length == 0) {
+			player.openInventory(new ServerWaypointUI(plugin, player.getUniqueId(), player).getInventory());
+			return true;
 		}
 
-		player.openInventory(new ServerWaypointUI(plugin, target, player).getInventory());
+		plugin.getServer().getScheduler().runTaskAsynchronously(
+				plugin,
+				() -> {
+					UUID target;
+					try {
+						target = UUID.fromString(args[0]);
+					} catch (IllegalArgumentException e) {
+						OfflinePlayer offline = plugin.getServer().getOfflinePlayer(args[0]);
+
+						if (!offline.isOnline() && !offline.hasPlayedBefore()) {
+							sender.sendMessage("Invalid recipient!");
+						}
+						target = offline.getUniqueId();
+					}
+					UUID finalTarget = target;
+					plugin.getServer().getScheduler().runTask(
+							plugin,
+							() -> player.openInventory(new ServerWaypointUI(plugin, finalTarget, player).getInventory()));
+				});
 		return true;
 	}
 
