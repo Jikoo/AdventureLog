@@ -36,8 +36,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class IndividualWaypointEditor extends SimpleUI {
 
-	public IndividualWaypointEditor(@NotNull AdventureLogPlugin plugin, @NotNull Class<? extends Waypoint> waypointClazz,
-			@Nullable Waypoint waypoint, @NotNull UUID owner) {
+	public IndividualWaypointEditor(
+			@NotNull AdventureLogPlugin plugin,
+			@NotNull Class<? extends Waypoint> waypointClazz,
+			@Nullable Waypoint waypoint,
+			@NotNull UUID owner) {
 		super(ChatColor.DARK_RED + (waypoint != null ? "Modify " + waypoint.getName() : "New Waypoint Creator"), false);
 
 		// BUTTON: set icon item
@@ -286,8 +289,11 @@ public class IndividualWaypointEditor extends SimpleUI {
 		});
 	}
 
-	private static ItemStack getIcon(@NotNull AdventureLogPlugin plugin,
-			@NotNull Class<? extends Waypoint> waypointClazz, @Nullable Waypoint waypoint, @NotNull UUID owner) {
+	private static ItemStack getIcon(
+			@NotNull AdventureLogPlugin plugin,
+			@NotNull Class<? extends Waypoint> waypointClazz,
+			@Nullable Waypoint waypoint,
+			@NotNull UUID owner) {
 		if (waypoint == null) {
 			if (UserWaypoint.class.equals(waypointClazz)) {
 				return ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Create New Waypoint");

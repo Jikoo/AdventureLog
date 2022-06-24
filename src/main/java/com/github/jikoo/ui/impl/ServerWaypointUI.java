@@ -26,18 +26,23 @@ public class ServerWaypointUI extends SimpleUI {
 		UserWaypointEditor.addIfEligible(this, viewer, plugin, owner);
 	}
 
-	public static void addIfEligible(@NotNull SimpleUI targetUI, @NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
+	public static void addIfEligible(
+			@NotNull SimpleUI targetUI,
+			@NotNull AdventureLogPlugin plugin,
+			@NotNull UUID owner) {
 		if (!(targetUI instanceof ServerWaypointUI)) {
 			targetUI.setNavButton(1, getButton(plugin, owner));
 		}
 	}
 
-	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
-		return new Button(ItemUtil.getItem(Material.KNOWLEDGE_BOOK, ChatColor.GOLD + "Server Waypoints"), event -> {
-			if (event.getWhoClicked() instanceof Player player) {
-				player.openInventory(new ServerWaypointUI(plugin, owner, player).getInventory());
-			}
-		});
+	private static @NotNull Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
+		return new Button(
+				ItemUtil.getItem(Material.KNOWLEDGE_BOOK, ChatColor.GOLD + "Server Waypoints"),
+				event -> {
+					if (event.getWhoClicked() instanceof Player player) {
+						player.openInventory(new ServerWaypointUI(plugin, owner, player).getInventory());
+					}
+				});
 	}
 
 }

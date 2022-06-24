@@ -1,5 +1,6 @@
 package com.github.jikoo.data;
 
+import com.github.jikoo.event.WaypointUnlockEvent;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
@@ -21,11 +22,13 @@ public class UserData extends YamlData {
 
 	private final Map<String, UserWaypoint> waypoints;
 	private final Supplier<ServerData> serverDataSupplier;
+	private final UUID uuid;
 
 	public UserData(Plugin plugin, UUID uuid, Supplier<ServerData> supplier) {
 		super(plugin, new File(new File(plugin.getDataFolder(), "playerdata"), uuid.toString() + ".yml"));
 		this.waypoints = new HashMap<>();
 		this.serverDataSupplier = supplier;
+		this.uuid = uuid;
 
 		// Migrate old unlocked waypoints
 		if (raw().isList("waypoints")) {
@@ -89,6 +92,13 @@ public class UserData extends YamlData {
 		if (waypoint == null || waypoint.isDefault()) {
 			return false;
 		}
+
+		WaypointUnlockEvent event = new WaypointUnlockEvent(uuid, waypoint);
+		event.fire();
+		if (event.isCancelled()) {
+			return false;
+		}
+
 		unlocked.add(waypointName);
 		setUnlocked(unlocked);
 		return true;

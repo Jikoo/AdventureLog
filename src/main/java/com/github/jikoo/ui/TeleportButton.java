@@ -1,6 +1,7 @@
 package com.github.jikoo.ui;
 
 import com.github.jikoo.data.IWaypoint;
+import com.github.jikoo.event.DelayedTeleportEvent;
 import com.github.jikoo.util.DelayedTeleport;
 import com.github.jikoo.util.ItemUtil;
 import com.github.jikoo.util.TextUtil;
@@ -27,7 +28,9 @@ public class TeleportButton extends Button {
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("World not loaded!", ChatColor.RED));
 				return;
 			}
-			new DelayedTeleport(plugin, player, destination, 3)
+			DelayedTeleportEvent delayedTeleportEvent = new DelayedTeleportEvent(player, waypoint, 8);
+			delayedTeleportEvent.fire();
+			new DelayedTeleport(plugin, player, destination, delayedTeleportEvent.getDelaySeconds())
 					.runTaskTimer(plugin, 0L, 2L);
 		});
 	}

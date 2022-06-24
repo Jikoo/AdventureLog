@@ -33,15 +33,21 @@ public class UserWaypointUI extends SimpleUI {
 			if (!target.isOnline() && !target.hasPlayedBefore()
 					|| (destination = target.getBedSpawnLocation()) == null
 					&& !plugin.getConfig().getBoolean("personal.respawn-point.default-to-spawn")) {
-				addButton(new Button(ItemUtil.getItem(Material.BARRIER, ChatColor.RED + "No Respawn Point"), event -> event.setCancelled(true)));
+				addButton(
+						new Button(
+								ItemUtil.getItem(Material.BARRIER, ChatColor.RED + "No Respawn Point"),
+								event -> {}));
 			} else {
 				// TODO charge respawn anchor
-				addButton(new TeleportButton(plugin, new SimpleWaypoint("Respawn Location", Material.RESPAWN_ANCHOR, () -> {
-					if (destination == null) {
-						return plugin.getServer().getWorlds().get(0).getSpawnLocation();
-					}
-					return destination;
-				})));
+				addButton(new TeleportButton(plugin, new SimpleWaypoint(
+						"Respawn Location",
+						Material.RESPAWN_ANCHOR,
+						() -> {
+							if (destination == null) {
+								return plugin.getServer().getWorlds().get(0).getSpawnLocation();
+							}
+							return destination;
+						})));
 			}
 		}
 
@@ -55,7 +61,7 @@ public class UserWaypointUI extends SimpleUI {
 
 	}
 
-	private static String getName(UUID uuid) {
+	private static @NotNull String getName(@NotNull UUID uuid) {
 		OfflinePlayer offline = Bukkit.getOfflinePlayer(uuid);
 		if (offline.getName() != null) {
 			return ChatColor.DARK_PURPLE + "Personal/" + offline.getName();
@@ -63,8 +69,11 @@ public class UserWaypointUI extends SimpleUI {
 		return ChatColor.DARK_PURPLE.toString() + uuid;
 	}
 
-	public static void addIfEligible(@NotNull SimpleUI targetUI, @NotNull Player viewer,
-			@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
+	public static void addIfEligible(
+			@NotNull SimpleUI targetUI,
+			@NotNull Player viewer,
+			@NotNull AdventureLogPlugin plugin,
+			@NotNull UUID owner) {
 		if (!(targetUI instanceof UserWaypointUI)
 				&& (viewer.getUniqueId().equals(owner) || viewer.hasPermission("adventurelog.view.other"))
 				&& (plugin.getConfig().getBoolean("personal.spawn-as-waypoint")
@@ -75,11 +84,13 @@ public class UserWaypointUI extends SimpleUI {
 	}
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
-		return new Button(ItemUtil.getItem(Material.RED_BED, ChatColor.GOLD + "Personal Waypoints"), event -> {
-			if (event.getWhoClicked() instanceof Player player) {
-				player.openInventory(new UserWaypointUI(plugin, owner, player).getInventory());
-			}
-		});
+		return new Button(
+				ItemUtil.getItem(Material.RED_BED, ChatColor.GOLD + "Personal Waypoints"),
+				event -> {
+					if (event.getWhoClicked() instanceof Player player) {
+						player.openInventory(new UserWaypointUI(plugin, owner, player).getInventory());
+					}
+				});
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.github.jikoo.ui;
 
+import com.github.jikoo.event.InterfacePreDrawEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -102,6 +103,7 @@ public class SimpleUI implements InventoryHolder {
 	@Override
 	public @NotNull Inventory getInventory() {
 		Inventory inventory = Bukkit.createInventory(this, getInventorySize(), name);
+		new InterfacePreDrawEvent(this).fire();
 		draw(inventory);
 		return inventory;
 	}

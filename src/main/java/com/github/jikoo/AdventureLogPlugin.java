@@ -116,7 +116,7 @@ public class AdventureLogPlugin extends JavaPlugin {
 				key.getNamespace().equals(getName().toLowerCase()) && key.getKey().equals("adventure_log"));
 	}
 
-	public int getPermittedPersonalWarps(Player player) {
+	public int getPermittedPersonalWarps(@NotNull Player player) {
 		if (player.hasPermission("adventurelog.personal.unlimited")) {
 			return Integer.MAX_VALUE;
 		}

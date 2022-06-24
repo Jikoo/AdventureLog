@@ -28,19 +28,24 @@ public class ServerWaypointEditor extends SimpleUI {
 		UserWaypointEditor.addIfEligible(this, viewer, plugin, owner);
 	}
 
-	public static void addIfEligible(@NotNull SimpleUI targetUI, @NotNull Player viewer,
-			@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
+	public static void addIfEligible(
+			@NotNull SimpleUI targetUI,
+			@NotNull Player viewer,
+			@NotNull AdventureLogPlugin plugin,
+			@NotNull UUID owner) {
 		if (!(targetUI instanceof  ServerWaypointEditor) && viewer.hasPermission("adventurelog.manage.server")) {
 			targetUI.setNavButton(0, getButton(plugin, owner));
 		}
 	}
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
-		return new Button(ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Edit Server Waypoints"), event -> {
-			if (event.getWhoClicked() instanceof Player player) {
-				player.openInventory(new ServerWaypointEditor(plugin, owner, player).getInventory());
-			}
-		});
+		return new Button(
+				ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Edit Server Waypoints"),
+				event -> {
+					if (event.getWhoClicked() instanceof Player player) {
+						player.openInventory(new ServerWaypointEditor(plugin, owner, player).getInventory());
+					}
+				});
 	}
 
 }

@@ -38,8 +38,11 @@ public class UserWaypointEditor extends SimpleUI {
 
 	}
 
-	public static void addIfEligible(@NotNull SimpleUI targetUI, @NotNull Player viewer,
-			@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
+	public static void addIfEligible(
+			@NotNull SimpleUI targetUI,
+			@NotNull Player viewer,
+			@NotNull AdventureLogPlugin plugin,
+			@NotNull UUID owner) {
 		if (!(targetUI instanceof UserWaypointEditor) && (!viewer.getUniqueId().equals(owner)
 				&& viewer.hasPermission("adventurelog.manage.other") || viewer.getUniqueId().equals(owner)
 				&& (plugin.getPermittedPersonalWarps(viewer) > 0
@@ -49,11 +52,13 @@ public class UserWaypointEditor extends SimpleUI {
 	}
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
-		return new Button(ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Edit Personal Waypoints"), event -> {
-			if (event.getWhoClicked() instanceof Player player) {
-				player.openInventory(new UserWaypointEditor(plugin, owner, player).getInventory());
-			}
-		});
+		return new Button(
+				ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Edit Personal Waypoints"),
+				event -> {
+					if (event.getWhoClicked() instanceof Player player) {
+						player.openInventory(new UserWaypointEditor(plugin, owner, player).getInventory());
+					}
+				});
 	}
 
 }
