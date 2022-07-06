@@ -89,23 +89,18 @@ public class IntegerButton extends Button {
 		components.add(Component.text().append(Component.text("Left click: ").color(NamedTextColor.WHITE), Component.text("+1").color(NamedTextColor.GOLD)).build());
 		components.add(Component.text().append(Component.text("Right click: ").color(NamedTextColor.WHITE), Component.text("-1").color(NamedTextColor.GOLD)).build());
 		components.add(Component.text().append(Component.text("Shift+click: ").color(NamedTextColor.WHITE), Component.text("±10").color(NamedTextColor.GOLD)).build());
-		Component.text().color(NamedTextColor.RED)
-				.append(
-						Component.text("Drop stack (Default ctrl+"),
-						Component.translatable("key.drop"),
-						Component.text(')'));
 		components.add(Component.text().color(NamedTextColor.WHITE)
 				.append(
-						Component.text("Drop (Default "),
+						Component.text("Drop ("),
 						Component.translatable("key.drop"),
-						Component.text(')'),
+						Component.text("): "),
 						Component.text("+100").color(NamedTextColor.GOLD))
 				.build());
 		components.add(Component.text().color(NamedTextColor.WHITE)
 				.append(
-						Component.text("Drop stack (Default ctrl+"),
+						Component.text("Drop stack (ctrl+"),
 						Component.translatable("key.drop"),
-						Component.text(')'),
+						Component.text("): "),
 						Component.text("-100").color(NamedTextColor.GOLD))
 				.build());
 

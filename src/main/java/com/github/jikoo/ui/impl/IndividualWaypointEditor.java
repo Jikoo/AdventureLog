@@ -397,10 +397,9 @@ public class IndividualWaypointEditor extends SimpleUI {
 			list.add(Component.text("  (Shift + right click to toggle)").color(NamedTextColor.GOLD));
 		}
 		list.add(Component.text(""));
-		list.add(Component.text("Drop to delete.").color(NamedTextColor.RED));
 		list.add(Component.text().color(NamedTextColor.RED)
 				.append(
-						Component.text("  (Default "),
+						Component.text("Drop to delete ("),
 						Component.translatable("key.drop"),
 						Component.text(')'))
 				.build());
