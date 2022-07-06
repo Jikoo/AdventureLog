@@ -11,7 +11,11 @@ import com.github.jikoo.ui.IntegerButton;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.util.ItemUtil;
 import com.github.jikoo.util.TextUtil;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -23,12 +27,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,22 +45,28 @@ public class IndividualWaypointEditor extends SimpleUI {
 			@NotNull Class<? extends Waypoint> waypointClazz,
 			@Nullable Waypoint waypoint,
 			@NotNull UUID owner) {
-		super(ChatColor.DARK_RED + (waypoint != null ? "Modify " + waypoint.getName() : "New Waypoint Creator"), false);
+		super(Component.text(waypoint != null ? "Modify " + waypoint.getName() : "New Waypoint Creator").color(NamedTextColor.DARK_RED), false);
 
 		// BUTTON: set icon item
 		ItemStack waypointIcon;
 		ItemStack waypointItem;
 		if (waypoint != null) {
 			waypointIcon = waypoint.getIcon().clone();
-			ItemUtil.insertText(waypointIcon, ChatColor.GOLD + "Set Icon",
-					ChatColor.WHITE + "Click with an item", ChatColor.WHITE + "to set waypoint item");
+			ItemUtil.insertText(
+					waypointIcon,
+					Component.text("Set Icon").color(NamedTextColor.GOLD),
+					Component.text("Click with an item").color(NamedTextColor.WHITE),
+					Component.text("to set waypoint item").color(NamedTextColor.WHITE));
 			waypointItem = waypoint.getIcon().clone();
 		} else {
 			waypointIcon = new ItemStack(Material.RED_STAINED_GLASS_PANE);
 			ItemMeta waypointMeta = waypointIcon.getItemMeta();
 			if (waypointMeta != null) {
-				waypointMeta.setDisplayName(ChatColor.RED + "Icon Item Unset");
-				waypointMeta.setLore(Arrays.asList(ChatColor.WHITE + "Click with an item", ChatColor.WHITE + "to set waypoint item"));
+				waypointMeta.displayName(Component.text("Icon Item Unset").color(NamedTextColor.RED));
+				waypointMeta.lore(
+						List.of(
+								Component.text("Click with an item").color(NamedTextColor.WHITE),
+								Component.text("to set waypoint item").color(NamedTextColor.WHITE)));
 			}
 			waypointIcon.setItemMeta(waypointMeta);
 			waypointItem = new ItemStack(Material.AIR);
@@ -76,8 +86,11 @@ public class IndividualWaypointEditor extends SimpleUI {
 			waypointIcon.setAmount(newItem.getAmount());
 			ItemMeta newMeta = newItem.getItemMeta();
 			waypointIcon.setItemMeta(newMeta != null ? newMeta.clone() : null);
-			ItemUtil.insertText(waypointIcon, ChatColor.GOLD + "Set Waypoint Icon",
-					ChatColor.WHITE + "Click with an item", ChatColor.WHITE + "to set waypoint item");
+			ItemUtil.insertText(
+					waypointIcon,
+					Component.text("Set Waypoint Icon").color(NamedTextColor.GOLD),
+					Component.text("Click with an item").color(NamedTextColor.WHITE),
+					Component.text("to set waypoint item").color(NamedTextColor.WHITE));
 			if (waypoint != null) {
 				waypoint.setIcon(newItem);
 			} else {
@@ -91,14 +104,21 @@ public class IndividualWaypointEditor extends SimpleUI {
 
 		// BUTTON: Set location
 		if (waypoint != null) {
-			addButton(new Button(() -> ItemUtil.getItem(Material.ARMOR_STAND, ChatColor.GOLD + "Set Location",
-					ChatColor.WHITE + "Right click to set", ChatColor.WHITE + "to current position.", "",
-					ChatColor.WHITE + "Current: " + ChatColor.GOLD + TextUtil.getDisplay(waypoint.getLocation())), event -> {
-				if (event.getClick() == ClickType.RIGHT) {
-					waypoint.setLocation(event.getWhoClicked().getLocation());
-					draw(event.getView().getTopInventory());
-				}
-			}));
+			addButton(new Button(() -> ItemUtil.getItem(
+					Material.ARMOR_STAND,
+					Component.text("Set Location").color(NamedTextColor.GOLD),
+					Component.text("Right click to set").color(NamedTextColor.WHITE),
+					Component.text("to current position.").color(NamedTextColor.WHITE),
+					Component.text(""),
+					Component.text().append(
+							Component.text("Current: ").color(NamedTextColor.WHITE),
+							Component.text(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD)).build()),
+					event -> {
+						if (event.getClick() == ClickType.RIGHT) {
+							waypoint.setLocation(event.getWhoClicked().getLocation());
+							draw(event.getView().getTopInventory());
+						}
+					}));
 		}
 
 		// Server waypoint exclusives: discoverability and priority
@@ -122,7 +142,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 				if (serverWP != null) {
 					serverWP.setRange(value.get());
 				}
-			}, "Discovery Range", ChatColor.GOLD + "0 = Disable discovery"));
+			}, "Discovery Range", Component.text("0 = Disable discovery").color(NamedTextColor.GOLD)));
 
 			// BUTTON: Set default discovered
 			defaultDiscovered = new AtomicBoolean(serverWP != null && serverWP.isDefault());
@@ -143,9 +163,9 @@ public class IndividualWaypointEditor extends SimpleUI {
 			ItemStack finalizeItem = new ItemStack(Material.END_CRYSTAL);
 			ItemMeta finalizeItemMeta = finalizeItem.getItemMeta();
 			if (finalizeItemMeta != null) {
-				finalizeItemMeta.setDisplayName(ChatColor.GREEN + "Finish " + (waypoint != null ? "Editing" : "Creation"));
+				finalizeItemMeta.displayName(Component.text("Finish " + (waypoint != null ? "Editing" : "Creation")).color(NamedTextColor.GREEN));
 				if (waypoint == null && waypointItem.getType() == Material.AIR) {
-					finalizeItemMeta.setLore(Collections.singletonList(ChatColor.RED + "Waypoint item not set!"));
+					finalizeItemMeta.lore(List.of(Component.text("Waypoint item not set!").color(NamedTextColor.RED)));
 				}
 			}
 			finalizeItem.setItemMeta(finalizeItemMeta);
@@ -175,10 +195,10 @@ public class IndividualWaypointEditor extends SimpleUI {
 			@NotNull
 			@Override
 			public String getPromptText(@NotNull ConversationContext context) {
-				return ChatColor.DARK_AQUA + "Enter name. Valid characters: "
-						+ ChatColor.GOLD + "a" + ChatColor.WHITE + "-" + ChatColor.GOLD + "z" + ChatColor.WHITE + ", "
-						+ ChatColor.GOLD + "_" + ChatColor.WHITE + ", "
-						+ ChatColor.GOLD + "0" + ChatColor.WHITE + "-" + ChatColor.GOLD + "0";
+				return LegacyComponentSerializer.legacySection().serialize(
+						Component.text()
+								.append(getValidChars("Enter name. ", NamedTextColor.DARK_AQUA, NamedTextColor.GOLD))
+								.build());
 			}
 
 			@Override
@@ -193,7 +213,12 @@ public class IndividualWaypointEditor extends SimpleUI {
 					return this;
 				}
 				if (plugin.getDataManager().getServerData().getWaypoint(input) != null) {
-					player.sendMessage(ChatColor.RED + "A waypoint by the name \"" + ChatColor.AQUA + input + ChatColor.RED + "\" already exists! Please edit it instead.");
+					player.sendMessage(
+							Component.text().color(NamedTextColor.RED).append(
+									Component.text("A waypoint by the name \""),
+									Component.text(input).color(NamedTextColor.AQUA),
+									Component.text("\" already exists! Please edit it instead."))
+									.build());
 					return Prompt.END_OF_CONVERSATION;
 				}
 
@@ -207,20 +232,51 @@ public class IndividualWaypointEditor extends SimpleUI {
 				if (defaultDiscovered != null) {
 					waypoint.setDefault(defaultDiscovered.get());
 				}
-				player.sendTitle("",ChatColor.GREEN + "Waypoint created successfully!", 10, 50, 20);
+				player.showTitle(
+						Title.title(
+								Component.text("Waypoint created successfully!").color(NamedTextColor.GREEN),
+								Component.text(""),
+								Title.Times.times(Duration.ofMillis(500L), Duration.ofMillis(2_500L), Duration.ofMillis(1_000L))));
 				return Prompt.END_OF_CONVERSATION;
 			}
 		}).buildConversation(player);
 
-		player.sendTitle(ChatColor.DARK_AQUA + "Enter Waypoint Name", ChatColor.RED + "Valid characters: "
-				+ ChatColor.AQUA + "a" + ChatColor.RED + "-" + ChatColor.AQUA + "z" + ChatColor.RED + ", "
-				+ ChatColor.AQUA + "_" + ChatColor.RED + ", "
-				+ ChatColor.AQUA + "0" + ChatColor.RED + "-" + ChatColor.AQUA + "0", 10, 50, 20);
+		player.showTitle(
+				Title.title(
+						Component.text("Enter Waypoint Name").color(NamedTextColor.DARK_AQUA),
+						getValidChars(null, NamedTextColor.RED, NamedTextColor.AQUA),
+						Title.Times.times(Duration.ofMillis(500L), Duration.ofMillis(2_500L), Duration.ofMillis(1_000L))));
 
 		player.beginConversation(conversation);
 	}
 
-	public static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull Class<? extends Waypoint> waypointClazz,
+	private static @NotNull Component getValidChars(
+			@Nullable String prefix,
+			@NotNull TextColor primary,
+			@NotNull TextColor secondary) {
+		String validChars = "Valid characters: ";
+		if (prefix != null) {
+			validChars = prefix + validChars;
+		}
+		Component hyphen = Component.text('-');
+		Component separator = Component.text(", ");
+		return Component.text().color(primary)
+				.append(
+						Component.text(validChars),
+						Component.text('a').color(secondary),
+						hyphen,
+						Component.text('z').color(secondary),
+						separator,
+						Component.text('_'),
+						separator,
+						Component.text('0').color(secondary),
+						hyphen,
+						Component.text('9').color(secondary))
+				.build();
+	}
+
+	@Contract(value = "_, _, _, _ -> new", pure = true)
+	public static @NotNull Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull Class<? extends Waypoint> waypointClazz,
 			@Nullable Waypoint waypoint, @NotNull UUID owner) {
 		return new Button(() -> getIcon(plugin, waypointClazz, waypoint, owner), event -> {
 			ItemStack clicked = event.getCurrentItem();
@@ -289,17 +345,17 @@ public class IndividualWaypointEditor extends SimpleUI {
 		});
 	}
 
-	private static ItemStack getIcon(
+	private static @NotNull ItemStack getIcon(
 			@NotNull AdventureLogPlugin plugin,
 			@NotNull Class<? extends Waypoint> waypointClazz,
 			@Nullable Waypoint waypoint,
 			@NotNull UUID owner) {
 		if (waypoint == null) {
 			if (UserWaypoint.class.equals(waypointClazz)) {
-				return ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Create New Waypoint");
+				return ItemUtil.getItem(Material.WRITABLE_BOOK, Component.text("Create New Waypoint").color(NamedTextColor.GOLD));
 			}
 
-			return ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "New Waypoint Editor");
+			return ItemUtil.getItem(Material.WRITABLE_BOOK, Component.text("New Waypoint Editor").color(NamedTextColor.GOLD));
 		}
 
 		if (waypoint.isInvalid()) {
@@ -307,22 +363,47 @@ public class IndividualWaypointEditor extends SimpleUI {
 			return new ItemStack(Material.AIR);
 		}
 
-		List<String> list = new ArrayList<>();
-		list.add(ChatColor.WHITE + "Edit waypoint: " + ChatColor.GOLD + waypoint.getName());
-		list.add(ChatColor.GOLD + TextUtil.getDisplay(waypoint.getLocation()));
+		List<Component> list = new ArrayList<>();
+		list.add(Component.text()
+				.append(
+						Component.text("Edit waypoint: ").color(NamedTextColor.WHITE),
+						Component.text(waypoint.getName()).color(NamedTextColor.GOLD))
+				.build());
+		list.add(Component.text(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD));
 		if (waypoint instanceof ServerWaypoint serverWaypoint) {
-			list.add(ChatColor.WHITE + "Priority: " + ChatColor.GOLD + serverWaypoint.getPriority());
-			list.add(ChatColor.WHITE + "Discovery range: " + ChatColor.GOLD
-					+ (serverWaypoint.getRangeSquared() < 1 ? -1 : (int) Math.sqrt(serverWaypoint.getRangeSquared())));
-			list.add(ChatColor.WHITE + "Always Discovered: " + ChatColor.GOLD + serverWaypoint.isDefault());
-			list.add("");
-			list.add(ChatColor.WHITE + "Unlocked for " + getName(owner) + ": " + ChatColor.GOLD
-					+ plugin.getDataManager().getUserData(owner).getUnlocked().contains(waypoint.getName()));
-			list.add(ChatColor.GOLD + "  (Shift + Rclick to toggle)");
+			list.add(Component.text()
+					.append(
+							Component.text("Priority: ").color(NamedTextColor.WHITE),
+							Component.text(serverWaypoint.getPriority()).color(NamedTextColor.GOLD))
+					.build());
+			list.add(Component.text()
+					.append(
+							Component.text("Discovery range: ").color(NamedTextColor.WHITE),
+							Component.text(serverWaypoint.getRangeSquared() < 1 ? -1 : (int) Math.sqrt(serverWaypoint.getRangeSquared()))
+									.color(NamedTextColor.GOLD))
+					.build());
+			list.add(Component.text()
+					.append(
+							Component.text("Always Discovered: ").color(NamedTextColor.WHITE),
+							Component.text(serverWaypoint.isDefault()).color(NamedTextColor.GOLD))
+					.build());
+			list.add(Component.text(""));
+			list.add(Component.text()
+					.append(
+							Component.text("Unlocked for " + getName(owner) + ": ").color(NamedTextColor.WHITE),
+							Component.text(plugin.getDataManager().getUserData(owner).getUnlocked().contains(waypoint.getName()))
+									.color(NamedTextColor.GOLD))
+					.build());
+			list.add(Component.text("  (Shift + right click to toggle)").color(NamedTextColor.GOLD));
 		}
-		list.add("");
-		list.add(ChatColor.RED + "Drop to delete.");
-		list.add(ChatColor.RED + "  (Default Q)");
+		list.add(Component.text(""));
+		list.add(Component.text("Drop to delete.").color(NamedTextColor.RED));
+		list.add(Component.text().color(NamedTextColor.RED)
+				.append(
+						Component.text("  (Default "),
+						Component.translatable("key.drop"),
+						Component.text(')'))
+				.build());
 		return ItemUtil.insertText(waypoint.getIcon().clone(), list);
 	}
 

@@ -1,6 +1,7 @@
 package com.github.jikoo.data;
 
 import com.github.jikoo.util.ItemUtil;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -15,9 +16,9 @@ public interface IWaypoint {
 	default @NotNull ItemStack getIcon() {
 		return ItemUtil.getItem(
 				Material.DIRT,
-				getName(),
-				"Something went wrong loading icon!",
-				"Please enjoy this complimentary dirt.");
+				Component.text(getName()),
+				Component.text("Something went wrong loading icon!"),
+				Component.text("Please enjoy this complimentary dirt."));
 	}
 
 }

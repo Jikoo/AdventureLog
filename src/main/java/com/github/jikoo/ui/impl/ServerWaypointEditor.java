@@ -5,7 +5,8 @@ import com.github.jikoo.data.ServerWaypoint;
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.util.ItemUtil;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ import java.util.UUID;
 public class ServerWaypointEditor extends SimpleUI {
 
 	ServerWaypointEditor(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner, @NotNull Player viewer) {
-		super(ChatColor.DARK_PURPLE + "Adventure Log Editor");
+		super(Component.text("Adventure Log Editor").color(NamedTextColor.DARK_PURPLE));
 
 		plugin.getDataManager().getServerData().getWaypoints().forEach(waypoint ->
 				addButton(IndividualWaypointEditor.getButton(plugin, ServerWaypoint.class, waypoint, owner)));
@@ -40,7 +41,7 @@ public class ServerWaypointEditor extends SimpleUI {
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(
-				ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Edit Server Waypoints"),
+				ItemUtil.getItem(Material.WRITABLE_BOOK, Component.text("Edit Server Waypoints").color(NamedTextColor.GOLD)),
 				event -> {
 					if (event.getWhoClicked() instanceof Player player) {
 						player.openInventory(new ServerWaypointEditor(plugin, owner, player).getInventory());

@@ -5,7 +5,8 @@ import com.github.jikoo.data.UserWaypoint;
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.util.ItemUtil;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ import java.util.UUID;
 public class UserWaypointEditor extends SimpleUI {
 
 	UserWaypointEditor(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner, @NotNull Player viewer) {
-		super(ChatColor.DARK_PURPLE + "Adventure Log Editor");
+		super(Component.text("Adventure Log Editor").color(NamedTextColor.DARK_PURPLE));
 
 		plugin.getDataManager().getUserData(owner).getUserWaypoints().forEach(waypoint ->
 				addButton(IndividualWaypointEditor.getButton(plugin, UserWaypoint.class, waypoint, owner)));
@@ -51,9 +52,9 @@ public class UserWaypointEditor extends SimpleUI {
 		}
 	}
 
-	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
+	private static @NotNull Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(
-				ItemUtil.getItem(Material.WRITABLE_BOOK, ChatColor.GOLD + "Edit Personal Waypoints"),
+				ItemUtil.getItem(Material.WRITABLE_BOOK, Component.text("Edit Personal Waypoints").color(NamedTextColor.GOLD)),
 				event -> {
 					if (event.getWhoClicked() instanceof Player player) {
 						player.openInventory(new UserWaypointEditor(plugin, owner, player).getInventory());

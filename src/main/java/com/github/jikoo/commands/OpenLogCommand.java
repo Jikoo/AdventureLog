@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,7 +58,7 @@ public class OpenLogCommand implements TabExecutor {
 	public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
 			@NotNull String label, @NotNull String[] args) {
 		return args.length == 1 && sender.hasPermission("adventurelog.view.other")
-				? plugin.onTabComplete(sender, command, label, args) : Collections.emptyList();
+				? plugin.onTabComplete(sender, command, label, args) : List.of();
 	}
 
 }

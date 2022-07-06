@@ -1,8 +1,9 @@
 package com.github.jikoo.ui;
 
 import com.github.jikoo.event.InterfacePreDrawEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.banner.Pattern;
@@ -27,17 +28,17 @@ import java.util.function.Consumer;
 
 public class SimpleUI implements InventoryHolder {
 
-	private final String name;
+	private final Component name;
 	private final boolean actionBlocking;
 	private final TreeMap<Integer, Button> buttons = new TreeMap<>();
 	private final Map<Integer, Button> navigation = new HashMap<>();
 	private int startIndex = 0;
 
-	public SimpleUI(@NotNull String name) {
+	public SimpleUI(@NotNull Component name) {
 		this(name, true);
 	}
 
-	public SimpleUI(@NotNull String name, boolean actionBlocking) {
+	public SimpleUI(@NotNull Component name, boolean actionBlocking) {
 		this.name = name;
 		this.actionBlocking = actionBlocking;
 	}
@@ -141,7 +142,7 @@ public class SimpleUI implements InventoryHolder {
 	private Button getNavFirstPage() {
 		int maxPage = (int) Math.ceil(getHighestButton() / 45D);
 		String navName = "First Page";
-		String navIndex = getNavIndex(1, maxPage);
+		Component navIndex = getNavIndex(1, maxPage);
 
 		if (startIndex <= 0) {
 			return getNavDisabled(navName, navIndex);
@@ -162,7 +163,7 @@ public class SimpleUI implements InventoryHolder {
 
 	private @NotNull Button getNavPreviousPage() {
 		int maxPage = (int) Math.ceil(getHighestButton() / 45D);
-		String navIndex = getNavIndex(Math.max(1, startIndex / 45), maxPage);
+		Component navIndex = getNavIndex(Math.max(1, startIndex / 45), maxPage);
 
 		if (startIndex <= 0) {
 			return getNavDisabled("First Page", navIndex);
@@ -185,7 +186,7 @@ public class SimpleUI implements InventoryHolder {
 		int highestButton = getHighestButton();
 		int maxPage = (int) Math.ceil(highestButton / 45D);
 		int nextPage = Math.min(startIndex / 45 + 2, maxPage);
-		String navIndex = getNavIndex(nextPage, maxPage);
+		Component navIndex = getNavIndex(nextPage, maxPage);
 
 		if (highestCurrentButton >= highestButton) {
 			return getNavDisabled("Last Page", navIndex);
@@ -208,7 +209,7 @@ public class SimpleUI implements InventoryHolder {
 		int highestButton = getHighestButton();
 		int maxPage = (int) Math.ceil(highestButton / 45D);
 		String navName = "Last Page";
-		String navIndex = getNavIndex(maxPage, maxPage);
+		Component navIndex = getNavIndex(maxPage, maxPage);
 
 		if (highestCurrentButton >= highestButton) {
 			return getNavDisabled(navName, navIndex);
@@ -227,18 +228,18 @@ public class SimpleUI implements InventoryHolder {
 	}
 
 	@Contract(pure = true)
-	private @NotNull String getNavName(@NotNull String name) {
-		return ChatColor.WHITE + name;
+	private @NotNull Component getNavName(@NotNull String name) {
+		return Component.text(name).color(NamedTextColor.WHITE);
 	}
 
 	@Contract(pure = true)
-	private @NotNull String getNavIndex(int pageNumber, int maxPageNumber) {
-		return ChatColor.GOLD + "  " + pageNumber + '/' + maxPageNumber;
+	private @NotNull Component getNavIndex(int pageNumber, int maxPageNumber) {
+		return Component.text("  " + pageNumber + '/' + maxPageNumber).color(NamedTextColor.GOLD);
 	}
 
 	private @NotNull Button getNav(
 			@NotNull String name,
-			@NotNull String index,
+			@NotNull Component index,
 			@NotNull Consumer<InventoryClickEvent> consumer,
 			@NotNull Pattern... patterns) {
 		ItemStack itemStack = new ItemStack(Material.BLACK_BANNER);
@@ -246,20 +247,20 @@ public class SimpleUI implements InventoryHolder {
 
 		if (itemMeta instanceof BannerMeta bannerMeta) {
 			bannerMeta.setPatterns(List.of(patterns));
-			bannerMeta.setDisplayName(getNavName(name));
-			bannerMeta.setLore(List.of(index));
+			bannerMeta.displayName(getNavName(name));
+			bannerMeta.lore(List.of(index));
 			itemStack.setItemMeta(itemMeta);
 		}
 
 		return new Button(itemStack, consumer);
 	}
 
-	private @NotNull Button getNavDisabled(@NotNull String name, @NotNull String index) {
+	private @NotNull Button getNavDisabled(@NotNull String name, @NotNull Component index) {
 		ItemStack itemStack = new ItemStack(Material.BARRIER);
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (itemMeta != null) {
-			itemMeta.setDisplayName(getNavName(name));
-			itemMeta.setLore(List.of(index));
+			itemMeta.displayName(getNavName(name));
+			itemMeta.lore(List.of(index));
 			itemStack.setItemMeta(itemMeta);
 		}
 		return new Button(itemStack, event -> {});

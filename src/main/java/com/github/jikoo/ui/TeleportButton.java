@@ -5,9 +5,8 @@ import com.github.jikoo.event.DelayedTeleportEvent;
 import com.github.jikoo.util.DelayedTeleport;
 import com.github.jikoo.util.ItemUtil;
 import com.github.jikoo.util.TextUtil;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -25,7 +24,7 @@ public class TeleportButton extends Button {
 			}
 			Location destination = waypoint.getLocation();
 			if (!destination.isWorldLoaded()) {
-				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("World not loaded!", ChatColor.RED));
+				player.sendActionBar(Component.text("World not loaded!").color(NamedTextColor.RED));
 				return;
 			}
 			DelayedTeleportEvent delayedTeleportEvent = new DelayedTeleportEvent(player, waypoint, 8);
@@ -35,8 +34,11 @@ public class TeleportButton extends Button {
 		});
 	}
 
-	private static ItemStack getItem(IWaypoint waypoint) {
-		return ItemUtil.appendText(waypoint.getIcon().clone(), ChatColor.GOLD + TextUtil.getDisplay(waypoint.getLocation()), ChatColor.GOLD + "Click to teleport");
+	private static @NotNull ItemStack getItem(@NotNull IWaypoint waypoint) {
+		return ItemUtil.appendText(
+				waypoint.getIcon().clone(),
+				Component.text(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD),
+				Component.text("Click to teleport").color(NamedTextColor.GOLD));
 	}
 
 }

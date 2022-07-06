@@ -1,8 +1,6 @@
 package com.github.jikoo.data;
 
-import me.lucko.helper.bucket.Bucket;
-import me.lucko.helper.bucket.factory.BucketFactory;
-import me.lucko.helper.bucket.partitioning.PartitioningStrategies;
+import com.github.jikoo.planarwrappers.collections.DistributedTask;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -12,24 +10,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class ServerData extends YamlData {
 
-	private final Map<String, ServerWaypoint> loadedWaypoints;
-	private final Bucket<String> discoverableWaypoints;
-	private final Set<String> defaultWaypoints;
+	private final @NotNull Map<@NotNull String, @NotNull ServerWaypoint> loadedWaypoints;
+	private final @NotNull DistributedTask<@NotNull String> discoverableWaypoints;
+	private final @NotNull Set<@NotNull String> defaultWaypoints;
 
-	public ServerData(@NotNull Plugin plugin) {
+	public ServerData(@NotNull Plugin plugin, Consumer<Collection<String>> waypointDiscovery) {
 		super(plugin, new File(plugin.getDataFolder(), "waypoints.yml"));
-		this.discoverableWaypoints = BucketFactory.newHashSetBucket(60, PartitioningStrategies.lowestSize());
+		this.discoverableWaypoints = new DistributedTask<>(15, TimeUnit.SECONDS, waypointDiscovery);
 		this.loadedWaypoints = new HashMap<>();
 		this.defaultWaypoints = new HashSet<>();
 
@@ -57,10 +55,14 @@ public class ServerData extends YamlData {
 		}
 	}
 
+	public void scheduleDiscovery(@NotNull Plugin plugin) {
+		this.discoverableWaypoints.schedule(plugin);
+	}
+
 	private @NotNull Collection<String> getWaypointNames() {
 		Object waypoints = this.get("waypoints");
 		if (!(waypoints instanceof ConfigurationSection)) {
-			return Collections.emptyList();
+			return List.of();
 		}
 		return ((ConfigurationSection) waypoints).getKeys(false);
 	}
@@ -82,31 +84,22 @@ public class ServerData extends YamlData {
 		return this.loadedWaypoints.get(name);
 	}
 
-	public @NotNull Collection<ServerWaypoint> getWaypoints() {
-		return this.loadedWaypoints.values().stream().sorted(ServerWaypoint.COMPARATOR).collect(Collectors.toList());
+	public @NotNull Collection<@NotNull ServerWaypoint> getWaypoints() {
+		return this.loadedWaypoints.values().stream().sorted(ServerWaypoint.COMPARATOR).toList();
 	}
 
-	@NotNull Collection<String> getDefaultWaypointNames() {
+	@NotNull Collection<@NotNull String> getDefaultWaypointNames() {
 		return defaultWaypoints;
 	}
 
 	public @NotNull Collection<ServerWaypoint> getDefaultWaypoints() {
 		return this.defaultWaypoints.stream().map(this::getWaypoint).filter(Objects::nonNull)
-				.sorted(ServerWaypoint.COMPARATOR).collect(Collectors.toList());
-	}
-
-	public Collection<ServerWaypoint> next() {
-		// TODO implement own Bucket system, Helper includes tons of bloat
-		return this.discoverableWaypoints.asCycle().next().stream().map(this::getWaypoint)
-				.filter(Objects::nonNull).collect(Collectors.toList());
+				.sorted(ServerWaypoint.COMPARATOR).toList();
 	}
 
 	void notifyRangeUpdate(@NotNull ServerWaypoint waypoint) {
 		if (waypoint.getRangeSquared() < 1) {
 			this.discoverableWaypoints.remove(waypoint.getName());
-		}
-		if (this.defaultWaypoints.contains(waypoint.getName())) {
-			return;
 		}
 		this.discoverableWaypoints.add(waypoint.getName());
 	}

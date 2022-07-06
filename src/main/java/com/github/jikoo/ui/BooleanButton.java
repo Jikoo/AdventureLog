@@ -1,7 +1,8 @@
 package com.github.jikoo.ui;
 
 import com.github.jikoo.util.ItemUtil;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +36,12 @@ public class BooleanButton extends Button {
 	private static ItemStack getItem(@NotNull AtomicBoolean value, @NotNull Material typeOn, @NotNull Material typeOff,
 			@NotNull String name) {
 		return ItemUtil.getItem(value.get() ? typeOn : typeOff,
-				ChatColor.WHITE + name + ": " + ChatColor.GOLD + value.get(), ChatColor.WHITE + "Click to toggle");
+				Component.text()
+						.append(
+								Component.text(name + ": ").color(NamedTextColor.WHITE),
+								Component.text(value.get()).color(NamedTextColor.GOLD))
+						.build(),
+				Component.text("Click to toggle").color(NamedTextColor.WHITE));
 	}
 
 }

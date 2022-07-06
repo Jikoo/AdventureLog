@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UserData extends YamlData {
@@ -51,7 +50,7 @@ public class UserData extends YamlData {
 	}
 
 	public @NotNull Collection<UserWaypoint> getUserWaypoints() {
-		return this.waypoints.values().stream().sorted(Comparator.comparing(UserWaypoint::getSortingName)).collect(Collectors.toList());
+		return this.waypoints.values().stream().sorted(Comparator.comparing(UserWaypoint::getSortingName)).toList();
 	}
 
 	public @NotNull UserWaypoint createWaypoint(@NotNull Location location) {
@@ -68,15 +67,21 @@ public class UserData extends YamlData {
 
 	public @NotNull Collection<ServerWaypoint> getUnlockedWaypoints() {
 		ServerData serverData = this.serverDataSupplier.get();
-		return this.getUnlocked().stream().map(serverData::getWaypoint).filter(Objects::nonNull)
-				.sorted(ServerWaypoint.COMPARATOR).collect(Collectors.toList());
+		return this.getUnlocked().stream()
+				.map(serverData::getWaypoint)
+				.filter(Objects::nonNull)
+				.sorted(ServerWaypoint.COMPARATOR)
+				.toList();
 	}
 
 	public @NotNull Collection<ServerWaypoint> getAvailableWaypoints() {
 		ServerData serverData = this.serverDataSupplier.get();
 		return Stream.concat(this.getUnlocked().stream(), serverData.getDefaultWaypointNames().stream())
-				.distinct().map(serverData::getWaypoint).filter(Objects::nonNull).sorted(ServerWaypoint.COMPARATOR)
-				.collect(Collectors.toList());
+				.distinct()
+				.map(serverData::getWaypoint)
+				.filter(Objects::nonNull)
+				.sorted(ServerWaypoint.COMPARATOR)
+				.toList();
 	}
 
 	void notifyDelete(@NotNull UserWaypoint waypoint) {

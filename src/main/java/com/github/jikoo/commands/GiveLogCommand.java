@@ -9,9 +9,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GiveLogCommand implements TabExecutor {
 
@@ -22,8 +21,11 @@ public class GiveLogCommand implements TabExecutor {
 	}
 
 	@Override
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
-			@NotNull String[] args) {
+	public boolean onCommand(
+			@NotNull CommandSender sender,
+			@NotNull Command command,
+			@NotNull String alias,
+			@NotNull String @NotNull [] args) {
 
 		if (args.length < 1 && !(sender instanceof Player)) {
 			return false;
@@ -40,7 +42,7 @@ public class GiveLogCommand implements TabExecutor {
 			return true;
 		}
 
-		HashMap<Integer, ItemStack> addFailures = target.getInventory().addItem(plugin.getWaypointBook());
+		Map<Integer, ItemStack> addFailures = target.getInventory().addItem(plugin.getWaypointBook());
 
 		if (addFailures.size() > 0) {
 			sender.sendMessage(String.format("%s's inventory is full! ", target.getName()));
@@ -54,7 +56,7 @@ public class GiveLogCommand implements TabExecutor {
 	public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
 			@NotNull String[] args) {
 		return args.length == 1 && sender.hasPermission("adventurelog.givelog.other")
-				? plugin.onTabComplete(sender, command, alias, args) : Collections.emptyList();
+				? plugin.onTabComplete(sender, command, alias, args) : List.of();
 	}
 
 }

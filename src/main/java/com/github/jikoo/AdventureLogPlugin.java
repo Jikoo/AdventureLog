@@ -4,7 +4,8 @@ import com.github.jikoo.commands.GiveLogCommand;
 import com.github.jikoo.commands.ManageUnlockedWaypointsCommand;
 import com.github.jikoo.commands.OpenLogCommand;
 import com.google.common.collect.ImmutableList;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
@@ -46,7 +47,7 @@ public class AdventureLogPlugin extends JavaPlugin {
 		ItemMeta itemMeta = waypointBook.getItemMeta();
 
 		if (itemMeta instanceof KnowledgeBookMeta bookMeta) {
-			bookMeta.setDisplayName(ChatColor.DARK_PURPLE + "Adventure Log");
+			bookMeta.displayName(Component.text("Adventure Log").color(NamedTextColor.DARK_PURPLE));
 			bookMeta.addRecipe(waypointRecipeKey);
 			waypointBook.setItemMeta(bookMeta);
 		}

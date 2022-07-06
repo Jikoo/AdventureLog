@@ -1,12 +1,15 @@
 package com.github.jikoo.ui;
 
 import com.github.jikoo.util.ItemUtil;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -16,7 +19,7 @@ public class IntegerButton extends Button {
 			@NotNull AtomicInteger value,
 			@NotNull Material type,
 			@NotNull String name,
-			@NotNull String @NotNull ... additionalInfo) {
+			@NotNull Component @NotNull ... additionalInfo) {
 		this(value, type, null, name, additionalInfo);
 	}
 
@@ -25,7 +28,7 @@ public class IntegerButton extends Button {
 			@NotNull Material type,
 			@Nullable Consumer<AtomicInteger> postprocess,
 			@NotNull String name,
-			@NotNull String @NotNull ... additionalInfo) {
+			@NotNull Component @NotNull ... additionalInfo) {
 		this(value, Integer.MIN_VALUE, Integer.MAX_VALUE, type, postprocess, name, additionalInfo);
 	}
 
@@ -35,7 +38,7 @@ public class IntegerButton extends Button {
 			int maxValue,
 			@NotNull Material type,
 			@NotNull String name,
-			@NotNull String @NotNull ... additionalInfo) {
+			@NotNull Component @NotNull ... additionalInfo) {
 		this(value, minValue, maxValue, type, null, name, additionalInfo);
 	}
 
@@ -46,7 +49,7 @@ public class IntegerButton extends Button {
 			@NotNull Material type,
 			@Nullable Consumer<AtomicInteger> postprocess,
 			@NotNull String name,
-			@NotNull String @NotNull ... additionalInfo) {
+			@NotNull Component @NotNull ... additionalInfo) {
 		super(() -> getItem(value, type, name, additionalInfo), event -> {
 			int diff = switch (event.getClick()) {
 				case LEFT -> 1;
@@ -80,16 +83,34 @@ public class IntegerButton extends Button {
 			@NotNull AtomicInteger value,
 			@NotNull Material type,
 			@NotNull String name,
-			@NotNull String @NotNull ... additionalInfo) {
-		String[] newInfo = new String[6 + additionalInfo.length];
-		newInfo[0] = ChatColor.WHITE + name + ": " + ChatColor.GOLD + value.get();
-		newInfo[1] = ChatColor.WHITE + "Left click: " + ChatColor.GOLD + "+1";
-		newInfo[2] = ChatColor.WHITE + "Right click: " + ChatColor.GOLD + "-1";
-		newInfo[3] = ChatColor.WHITE + "Shift+click: " + ChatColor.GOLD + "±10";
-		newInfo[4] = ChatColor.WHITE + "Drop (default Q): " + ChatColor.GOLD + "+100";
-		newInfo[5] = ChatColor.WHITE + "Drop stack (Ctrl+Q): " + ChatColor.GOLD + "-100";
-		System.arraycopy(additionalInfo, 0, newInfo, 6, additionalInfo.length);
-		return ItemUtil.getItem(type, newInfo);
+			@NotNull Component @NotNull ... additionalInfo) {
+		List<Component> components = new ArrayList<>();
+		components.add(Component.text().append(Component.text(name + ": ").color(NamedTextColor.WHITE), Component.text(value.get()).color(NamedTextColor.GOLD)).build());
+		components.add(Component.text().append(Component.text("Left click: ").color(NamedTextColor.WHITE), Component.text("+1").color(NamedTextColor.GOLD)).build());
+		components.add(Component.text().append(Component.text("Right click: ").color(NamedTextColor.WHITE), Component.text("-1").color(NamedTextColor.GOLD)).build());
+		components.add(Component.text().append(Component.text("Shift+click: ").color(NamedTextColor.WHITE), Component.text("±10").color(NamedTextColor.GOLD)).build());
+		Component.text().color(NamedTextColor.RED)
+				.append(
+						Component.text("Drop stack (Default ctrl+"),
+						Component.translatable("key.drop"),
+						Component.text(')'));
+		components.add(Component.text().color(NamedTextColor.WHITE)
+				.append(
+						Component.text("Drop (Default "),
+						Component.translatable("key.drop"),
+						Component.text(')'),
+						Component.text("+100").color(NamedTextColor.GOLD))
+				.build());
+		components.add(Component.text().color(NamedTextColor.WHITE)
+				.append(
+						Component.text("Drop stack (Default ctrl+"),
+						Component.translatable("key.drop"),
+						Component.text(')'),
+						Component.text("-100").color(NamedTextColor.GOLD))
+				.build());
+
+		components.addAll(List.of(additionalInfo));
+		return ItemUtil.getItem(type, components);
 	}
 
 }

@@ -1,7 +1,8 @@
 package com.github.jikoo.data;
 
-import com.github.jikoo.util.TextUtil;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +39,7 @@ public class UserWaypoint extends Waypoint {
 		}
 		ItemMeta itemMeta = icon.getItemMeta();
 		if (itemMeta != null && !itemMeta.hasDisplayName()) {
-			itemMeta.setDisplayName(ChatColor.GOLD + "Home " + getName());
+			itemMeta.displayName(Component.text("Home " + getName()).color(NamedTextColor.GOLD));
 			icon.setItemMeta(itemMeta);
 		}
 		return icon;
@@ -49,17 +50,16 @@ public class UserWaypoint extends Waypoint {
 		super.setIcon(icon);
 
 		// Lift icon name for later use in sorting
-		String displayName = null;
+		Component displayName = null;
 		ItemMeta itemMeta = icon.getItemMeta();
 		if (itemMeta != null && itemMeta.hasDisplayName()) {
-			displayName = itemMeta.getDisplayName();
-			if (displayName.isEmpty()) {
-				displayName = null;
-			}
+			displayName = itemMeta.displayName();
 		}
 
 		this.set("custom_name", displayName);
-		this.set("comparable_name", displayName == null ? null : TextUtil.stripColor(displayName.toUpperCase()));
+		this.set(
+				"comparable_name",
+				displayName == null ? null : PlainTextComponentSerializer.plainText().serialize(displayName).toUpperCase());
 	}
 
 	@Override

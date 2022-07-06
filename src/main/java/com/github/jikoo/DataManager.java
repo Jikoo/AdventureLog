@@ -6,25 +6,30 @@ import com.github.jikoo.data.UserData;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.Title.Times;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class DataManager {
 
-	private final AdventureLogPlugin plugin;
-	private final ServerData serverData;
-	private final LoadingCache<UUID, UserData> playerCache;
+	private final @NotNull AdventureLogPlugin plugin;
+	private final @NotNull ServerData serverData;
+	private final @NotNull LoadingCache<UUID, UserData> playerCache;
 
-	DataManager(AdventureLogPlugin plugin) {
+	DataManager(@NotNull AdventureLogPlugin plugin) {
 		this.plugin = plugin;
-		this.serverData = new ServerData(plugin);
+		this.serverData = new ServerData(plugin, this::tryDiscovery);
 		this.playerCache = CacheBuilder.newBuilder()
 				.expireAfterAccess(5, TimeUnit.MINUTES)
 				.build(CacheLoader.from(uuid -> {
@@ -33,7 +38,7 @@ public class DataManager {
 					}
 					return new UserData(plugin, uuid, () -> serverData);
 				}));
-		startDiscovery();
+		serverData.scheduleDiscovery(plugin);
 	}
 
 	void save() {
@@ -52,29 +57,29 @@ public class DataManager {
 		}
 	}
 
-	private void startDiscovery() {
-		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-			Collection<ServerWaypoint> nextDiscoverySegment = serverData.next();
+	private void tryDiscovery(@NotNull Collection<String> waypointNames) {
+		var waypoints = waypointNames.stream().map(serverData::getWaypoint).filter(Objects::nonNull).toList();
 
-			if (nextDiscoverySegment.isEmpty()) {
-				// Quick return for few waypoints
-				return;
+		if (waypoints.isEmpty()) {
+			return;
+		}
+
+		for (Player player : plugin.getServer().getOnlinePlayers()) {
+			if (discoveryBlocked(player)) {
+				continue;
 			}
 
-			for (Player player : plugin.getServer().getOnlinePlayers()) {
-				if (discoveryBlocked(player)) {
-					continue;
-				}
-				for (ServerWaypoint waypoint : nextDiscoverySegment) {
-					if (waypoint.getRangeSquared() > -1 && player.getWorld().equals(waypoint.getLocation().getWorld())
-							&& player.getLocation().distanceSquared(waypoint.getLocation()) <= waypoint.getRangeSquared()
-							&& playerCache.getUnchecked(player.getUniqueId()).unlockWaypoint(waypoint.getName())) {
-						player.sendTitle("Waypoint discovered!", "Check your Adventure Log.", 10, 50, 20);
-					}
+			for (ServerWaypoint waypoint : waypoints) {
+				if (waypoint.getRangeSquared() > -1 && player.getWorld().equals(waypoint.getLocation().getWorld())
+						&& player.getLocation().distanceSquared(waypoint.getLocation()) <= waypoint.getRangeSquared()
+						&& playerCache.getUnchecked(player.getUniqueId()).unlockWaypoint(waypoint.getName())) {
+					player.showTitle(Title.title(
+							Component.text("Waypoint discovered!"),
+							Component.text("Check your Adventure Log."),
+							Times.times(Duration.ofMillis(500L), Duration.ofMillis(2_500L), Duration.ofMillis(1_000L))));
 				}
 			}
-
-		}, 60L, 1L);
+		}
 	}
 
 	private boolean discoveryBlocked(@NotNull Player player) {
@@ -98,11 +103,11 @@ public class DataManager {
 		return true;
 	}
 
-	public ServerData getServerData() {
+	public @NotNull ServerData getServerData() {
 		return this.serverData;
 	}
 
-	public UserData getUserData(@NotNull UUID uuid) {
+	public @NotNull UserData getUserData(@NotNull UUID uuid) {
 		return this.playerCache.getUnchecked(uuid);
 	}
 
