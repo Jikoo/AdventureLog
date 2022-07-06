@@ -92,9 +92,9 @@ public class IndividualWaypointEditor extends SimpleUI {
 		// BUTTON: Set location
 		if (waypoint != null) {
 			addButton(new Button(() -> ItemUtil.getItem(Material.ARMOR_STAND, ChatColor.GOLD + "Set Location",
-					ChatColor.WHITE + "Middle click to set", ChatColor.WHITE + "to current position.", "",
+					ChatColor.WHITE + "Right click to set", ChatColor.WHITE + "to current position.", "",
 					ChatColor.WHITE + "Current: " + ChatColor.GOLD + TextUtil.getDisplay(waypoint.getLocation())), event -> {
-				if (event.getClick() == ClickType.MIDDLE) {
+				if (event.getClick() == ClickType.RIGHT) {
 					waypoint.setLocation(event.getWhoClicked().getLocation());
 					draw(event.getView().getTopInventory());
 				}
@@ -251,7 +251,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 			}
 
 			// Action: Delete waypoint
-			if (event.getClick() == ClickType.CONTROL_DROP) {
+			if (event.getClick() == ClickType.DROP) {
 				waypoint.delete();
 				clicked.setType(Material.AIR);
 
@@ -321,8 +321,8 @@ public class IndividualWaypointEditor extends SimpleUI {
 			list.add(ChatColor.GOLD + "  (Shift + Rclick to toggle)");
 		}
 		list.add("");
-		list.add(ChatColor.RED + "Drop stack to delete.");
-		list.add(ChatColor.RED + "  (Default Ctrl+Q)");
+		list.add(ChatColor.RED + "Drop to delete.");
+		list.add(ChatColor.RED + "  (Default Q)");
 		return ItemUtil.insertText(waypoint.getIcon().clone(), list);
 	}
 
