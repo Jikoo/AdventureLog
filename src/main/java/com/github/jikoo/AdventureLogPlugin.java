@@ -35,6 +35,14 @@ public class AdventureLogPlugin extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		try {
+			Class.forName("com.destroystokyo.paper.PaperConfig");
+		} catch (ClassNotFoundException e) {
+			getLogger().severe(() -> getDescription().getName() + " requires Paper.");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+
 		saveDefaultConfig();
 
 		this.dataManager = new DataManager(this);
