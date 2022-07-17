@@ -4,6 +4,9 @@ discovery:
     - SURVIVAL
     - ADVENTURE
 
+general:
+  keep-book-on-death: true
+
 # Homes feature - personal customizable locations
 personal:
   # Add respawn location as waypoint

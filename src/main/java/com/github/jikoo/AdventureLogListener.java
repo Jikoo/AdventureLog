@@ -6,6 +6,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -82,6 +83,21 @@ public class AdventureLogListener implements Listener {
 		if (plugin.waypointRecipeKey.equals(event.getRecipe())) {
 			event.setCancelled(true);
 		}
+	}
+
+	@EventHandler
+	public void onPlayerDeath(@NotNull PlayerDeathEvent event) {
+		if (!plugin.getConfig().getBoolean("general.keep-book-on-death") || event.getKeepInventory()) {
+			return;
+		}
+
+		event.getDrops().removeIf(drop -> {
+			if (plugin.isWaypointBook(drop)) {
+				event.getItemsToKeep().add(drop);
+				return true;
+			}
+			return false;
+		});
 	}
 
 }
