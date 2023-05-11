@@ -30,19 +30,19 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.18.2-R0.1-SNAPSHOT</version>
+            <version>1.19.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>23.0.0</version>
+            <version>24.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.jikoo</groupId>
             <artifactId>planarwrappers</artifactId>
-            <version>ab57c86355</version>
+            <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -61,16 +61,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.1</version>
                 <configuration>
-                    <!-- Unfortunately, minimizeJar is broken. Watch MSHADE-366/MSHADE-400 for a fix. -->
-                    <minimizeJar>false</minimizeJar>
+                    <minimizeJar>true</minimizeJar>
                     <filters>
                         <filter>
-                            <artifact>com.github.jikoo:planarwrappers</artifact>
-                            <includes>
-                                <include>com/github/jikoo/planarwrappers/collections/DistributedTask.class</include>
-                            </includes>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/**</exclude>
+                            </excludes>
                         </filter>
                     </filters>
                 </configuration>

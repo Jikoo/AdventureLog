@@ -1,6 +1,6 @@
 package com.github.jikoo.data;
 
-import com.github.jikoo.planarwrappers.collections.DistributedTask;
+import com.github.jikoo.planarwrappers.scheduler.DistributedTask;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
