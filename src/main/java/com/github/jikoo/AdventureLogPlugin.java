@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
 
 public class AdventureLogPlugin extends JavaPlugin {
 
-	public final NamespacedKey waypointRecipeKey = new NamespacedKey(this, "adventure_log");
+	public static final String NAMESPACE = "adventurelog";
+	public static final NamespacedKey ADVENTURE_LOG_KEY = new NamespacedKey(NAMESPACE, "adventure_log");
 	private ItemStack waypointBook;
 	private DataManager dataManager;
 
@@ -47,7 +48,7 @@ public class AdventureLogPlugin extends JavaPlugin {
 
 		this.dataManager = new DataManager(this);
 
-		ShapelessRecipe recipe = new ShapelessRecipe(waypointRecipeKey, new ItemStack(Material.KNOWLEDGE_BOOK));
+		ShapelessRecipe recipe = new ShapelessRecipe(ADVENTURE_LOG_KEY, new ItemStack(Material.KNOWLEDGE_BOOK));
 		recipe.addIngredient(Material.PETRIFIED_OAK_SLAB);
 		getServer().addRecipe(recipe);
 
@@ -56,7 +57,7 @@ public class AdventureLogPlugin extends JavaPlugin {
 
 		if (itemMeta instanceof KnowledgeBookMeta bookMeta) {
 			bookMeta.displayName(Component.text("Adventure Log").color(NamedTextColor.DARK_PURPLE));
-			bookMeta.addRecipe(waypointRecipeKey);
+			bookMeta.addRecipe(ADVENTURE_LOG_KEY);
 			waypointBook.setItemMeta(bookMeta);
 		}
 
@@ -121,8 +122,7 @@ public class AdventureLogPlugin extends JavaPlugin {
 			return false;
 		}
 
-		return ((KnowledgeBookMeta) itemMeta).getRecipes().stream().anyMatch(key ->
-				key.getNamespace().equals(getName().toLowerCase()) && key.getKey().equals("adventure_log"));
+		return ((KnowledgeBookMeta) itemMeta).getRecipes().stream().anyMatch(key -> key.equals(ADVENTURE_LOG_KEY));
 	}
 
 	public int getPermittedPersonalWarps(@NotNull Player player) {

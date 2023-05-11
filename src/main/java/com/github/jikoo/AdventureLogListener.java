@@ -80,7 +80,7 @@ public class AdventureLogListener implements Listener {
 
 	@EventHandler
 	public void onPlayerRecipeDiscover(@NotNull PlayerRecipeDiscoverEvent event) {
-		if (plugin.waypointRecipeKey.equals(event.getRecipe())) {
+		if (AdventureLogPlugin.ADVENTURE_LOG_KEY.equals(event.getRecipe())) {
 			event.setCancelled(true);
 		}
 	}
