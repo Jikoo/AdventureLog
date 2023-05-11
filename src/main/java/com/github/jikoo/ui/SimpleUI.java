@@ -138,11 +138,14 @@ public class SimpleUI implements InventoryHolder {
 		inventory.setContents(contents);
 	}
 
+	private int getMaxPage() {
+		return (int) Math.ceil((getHighestButton() + 1) / 45D);
+	}
+
 	@NotNull
 	private Button getNavFirstPage() {
-		int maxPage = (int) Math.ceil(getHighestButton() / 45D);
 		String navName = "First Page";
-		Component navIndex = getNavIndex(1, maxPage);
+		Component navIndex = getNavIndex(1, getMaxPage());
 
 		if (startIndex <= 0) {
 			return getNavDisabled(navName, navIndex);
@@ -162,8 +165,7 @@ public class SimpleUI implements InventoryHolder {
 	}
 
 	private @NotNull Button getNavPreviousPage() {
-		int maxPage = (int) Math.ceil(getHighestButton() / 45D);
-		Component navIndex = getNavIndex(Math.max(1, startIndex / 45), maxPage);
+		Component navIndex = getNavIndex(Math.max(1, startIndex / 45), getMaxPage());
 
 		if (startIndex <= 0) {
 			return getNavDisabled("First Page", navIndex);
@@ -184,7 +186,7 @@ public class SimpleUI implements InventoryHolder {
 	private @NotNull Button getNavNextPage() {
 		int highestCurrentButton = startIndex + 44;
 		int highestButton = getHighestButton();
-		int maxPage = (int) Math.ceil(highestButton / 45D);
+		int maxPage = getMaxPage();
 		int nextPage = Math.min(startIndex / 45 + 2, maxPage);
 		Component navIndex = getNavIndex(nextPage, maxPage);
 
@@ -207,7 +209,7 @@ public class SimpleUI implements InventoryHolder {
 	private @NotNull Button getNavLastPage() {
 		int highestCurrentButton = startIndex + 44;
 		int highestButton = getHighestButton();
-		int maxPage = (int) Math.ceil(highestButton / 45D);
+		int maxPage = getMaxPage();
 		String navName = "Last Page";
 		Component navIndex = getNavIndex(maxPage, maxPage);
 
