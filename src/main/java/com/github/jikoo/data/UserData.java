@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class UserData extends YamlData {
 	}
 
 	public @NotNull Collection<UserWaypoint> getUserWaypoints() {
-		return this.waypoints.values().stream().sorted(Comparator.comparing(UserWaypoint::getSortingName)).toList();
+		return this.waypoints.values().stream().sorted(UserWaypoint.COMPARATOR).toList();
 	}
 
 	public @NotNull UserWaypoint createWaypoint(@NotNull Location location) {

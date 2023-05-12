@@ -1,5 +1,6 @@
 package com.github.jikoo.data;
 
+import com.github.jikoo.util.AlphanumComparator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -10,9 +11,19 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class UserWaypoint extends Waypoint {
+
+	public static final Comparator<UserWaypoint> COMPARATOR = new Comparator<>() {
+		private final Comparator<String> alphanumComparator = new AlphanumComparator();
+
+		@Override
+		public int compare(@NotNull UserWaypoint o1, @NotNull UserWaypoint o2) {
+			return alphanumComparator.compare(o1.getSortingName(), o2.getSortingName());
+		}
+	};
 
 	UserWaypoint(@NotNull UserData storage, @NotNull String name) {
 		super(storage, name);
@@ -24,7 +35,7 @@ public class UserWaypoint extends Waypoint {
 		return customName != null ? customName : super.getName();
 	}
 
-	public @NotNull String getSortingName() {
+	private @NotNull String getSortingName() {
 		String comparableName = this.getString("comparable_name");
 		return comparableName != null ? comparableName : getName();
 	}
