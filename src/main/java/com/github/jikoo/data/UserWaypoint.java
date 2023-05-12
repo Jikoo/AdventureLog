@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -68,9 +69,21 @@ public class UserWaypoint extends Waypoint {
 		}
 
 		this.set("custom_name", displayName);
-		this.set(
-				"comparable_name",
-				displayName == null ? null : PlainTextComponentSerializer.plainText().serialize(displayName).toUpperCase());
+		if (displayName == null) {
+			this.set("comparable_name", null);
+		} else {
+			/*
+			 * Strip down display name to form a more rapidly comparable value.
+			 * This value is cached and reused rather than do a much more expensive
+			 * (albeit slightly more accurate) Collator sort each time.
+			 *
+			 * Accents are intentionally not removed from the resulting normalized text
+			 * so as to cause consistent sorting differences for unequal inputs.
+			 */
+			String comparableText = PlainTextComponentSerializer.plainText().serialize(displayName);
+			comparableText = Normalizer.normalize(comparableText, Normalizer.Form.NFKD).toUpperCase();
+			this.set("comparable_name", comparableText);
+		}
 	}
 
 	@Override
