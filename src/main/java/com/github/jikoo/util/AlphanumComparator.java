@@ -1,13 +1,5 @@
 /*
- * The Alphanum Algorithm is an improved sorting algorithm for strings
- * containing numbers.  Instead of sorting numbers in ASCII order like
- * a standard sort, this algorithm sorts numbers in numeric order.
- *
- * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
- *
- * Released under the MIT License - https://opensource.org/licenses/MIT
- *
- * Copyright 2007-2017 David Koelle
+ * Copyright 2007-2017 David Koelle - http://www.DaveKoelle.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -29,47 +21,42 @@
  */
 package com.github.jikoo.util;
 
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * This is an updated version with enhancements made by Daniel Migowski,
+ * The Alphanum Algorithm is an improved sorting algorithm for strings
+ * containing numbers.  Instead of sorting numbers in ASCII order like
+ * a standard sort, this algorithm sorts numbers in numeric order.
+ *
+ * <p>This is an updated version with enhancements made by Daniel Migowski,
  * Andre Bogus, and David Koelle. Updated by David Koelle in 2017.
  *
- * To use this class:
- *   Use the static "sort" method from the java.util.Collections class:
- *   Collections.sort(your list, new AlphanumComparator());
+ * <p>Note that David Koelle's site is down; the most recent Wayback Machine
+ * capture of his Alphanum page can be found
+ * <a href=https://web.archive.org/web/20210803201519/http://www.davekoelle.com/alphanum.html>here</a>.
  */
-public class AlphanumComparator implements Comparator<String>
-{
-  private final boolean isDigit(char ch)
-  {
+public class AlphanumComparator implements Comparator<String> {
+
+  private boolean isDigit(char ch) {
     return ((ch >= 48) && (ch <= 57));
   }
 
   /** Length of string is passed in for improved efficiency (only need to calculate it once) **/
-  private final String getChunk(String s, int slength, int marker)
-  {
+  private String getChunk(String s, int slength, int marker) {
     StringBuilder chunk = new StringBuilder();
     char c = s.charAt(marker);
     chunk.append(c);
     marker++;
-    if (isDigit(c))
-    {
-      while (marker < slength)
-      {
+    if (isDigit(c)) {
+      while (marker < slength) {
         c = s.charAt(marker);
         if (!isDigit(c))
           break;
         chunk.append(c);
         marker++;
       }
-    } else
-    {
-      while (marker < slength)
-      {
+    } else {
+      while (marker < slength) {
         c = s.charAt(marker);
         if (isDigit(c))
           break;
@@ -80,10 +67,8 @@ public class AlphanumComparator implements Comparator<String>
     return chunk.toString();
   }
 
-  public int compare(String s1, String s2)
-  {
-    if ((s1 == null) || (s2 == null))
-    {
+  public int compare(String s1, String s2) {
+    if ((s1 == null) || (s2 == null)) {
       return 0;
     }
 
@@ -92,8 +77,7 @@ public class AlphanumComparator implements Comparator<String>
     int s1Length = s1.length();
     int s2Length = s2.length();
 
-    while (thisMarker < s1Length && thatMarker < s2Length)
-    {
+    while (thisMarker < s1Length && thatMarker < s2Length) {
       String thisChunk = getChunk(s1, s1Length, thisMarker);
       thisMarker += thisChunk.length();
 
@@ -102,26 +86,20 @@ public class AlphanumComparator implements Comparator<String>
 
       // If both chunks contain numeric characters, sort them numerically
       int result = 0;
-      if (isDigit(thisChunk.charAt(0)) && isDigit(thatChunk.charAt(0)))
-      {
+      if (isDigit(thisChunk.charAt(0)) && isDigit(thatChunk.charAt(0))) {
         // Simple chunk comparison by length.
         int thisChunkLength = thisChunk.length();
         result = thisChunkLength - thatChunk.length();
         // If equal, the first different number counts
-        if (result == 0)
-        {
-          for (int i = 0; i < thisChunkLength; i++)
-          {
+        if (result == 0) {
+          for (int i = 0; i < thisChunkLength; i++) {
             result = thisChunk.charAt(i) - thatChunk.charAt(i);
-            if (result != 0)
-            {
+            if (result != 0) {
               return result;
             }
           }
         }
-      }
-      else
-      {
+      } else {
         result = thisChunk.compareTo(thatChunk);
       }
 
@@ -132,12 +110,4 @@ public class AlphanumComparator implements Comparator<String>
     return s1Length - s2Length;
   }
 
-  /**
-   * Shows an example of how the comparator works.
-   * Feel free to delete this in your own code!
-   */
-  public static void main(String[] args) {
-    List<String> values = Arrays.asList("dazzle2", "dazzle10", "dazzle1", "dazzle2.7", "dazzle2.10", "2", "10", "1", "EctoMorph6", "EctoMorph62", "EctoMorph7");
-    System.out.println(values.stream().sorted(new AlphanumComparator()).collect(Collectors.joining(" ")));
-  }
 }
