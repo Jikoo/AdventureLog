@@ -21,6 +21,9 @@
  */
 package com.github.jikoo.util;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Comparator;
 
 /**
@@ -42,7 +45,7 @@ public class AlphanumComparator implements Comparator<String> {
   }
 
   /** Length of string is passed in for improved efficiency (only need to calculate it once) **/
-  private String getChunk(String s, int slength, int marker) {
+  private @NotNull String getChunk(@NotNull String s, int slength, int marker) {
     StringBuilder chunk = new StringBuilder();
     char c = s.charAt(marker);
     chunk.append(c);
@@ -67,9 +70,23 @@ public class AlphanumComparator implements Comparator<String> {
     return chunk.toString();
   }
 
-  public int compare(String s1, String s2) {
-    if ((s1 == null) || (s2 == null)) {
-      return 0;
+  /**
+   * Compare two strings containing numbers. Returns a negative integer, zero, or a positive
+   * integer as the first argument is less than, equal to, or greater than the second.
+   *
+   * <p>This comparator uses null-first ordering. If null values are to be sorted last, wrap with
+   * {@link Comparator#nullsLast(Comparator)}.</p>
+   *
+   * @param s1 the first object to be compared.
+   * @param s2 the second object to be compared.
+   * @return a negative integer, zero, or a positive integer as the first argument is less than,
+   *         equal to, or greater than the second.
+   */
+  public int compare(@Nullable String s1, @Nullable String s2) {
+    if (s1 == null) {
+      return s2 == null ? 0 : -1;
+    } else if (s2 == null) {
+      return 1;
     }
 
     int thisMarker = 0;
