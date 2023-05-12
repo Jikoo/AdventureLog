@@ -5,6 +5,7 @@ import com.github.jikoo.data.UserWaypoint;
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.util.ItemUtil;
+import com.github.jikoo.util.AdvLogPerms;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -27,8 +28,8 @@ public class UserWaypointEditor extends SimpleUI {
 			}
 		}));
 
-		if (viewer.getUniqueId().equals(owner) && this.getHighestButton() + 1 < plugin.getPermittedPersonalWarps(viewer)
-			|| !viewer.getUniqueId().equals(owner) && viewer.hasPermission("adventurelog.manage.other")) {
+		if (viewer.getUniqueId().equals(owner) && this.getHighestButton() + 1 < AdvLogPerms.getPermittedPersonalWarps(plugin.getConfig(), viewer)
+			|| !viewer.getUniqueId().equals(owner) && viewer.hasPermission(AdvLogPerms.MANAGE_PLAYER)) {
 			setNavButton(2, IndividualWaypointEditor.getButton(plugin, UserWaypoint.class, null, owner));
 		}
 
@@ -45,8 +46,8 @@ public class UserWaypointEditor extends SimpleUI {
 			@NotNull AdventureLogPlugin plugin,
 			@NotNull UUID owner) {
 		if (!(targetUI instanceof UserWaypointEditor) && (!viewer.getUniqueId().equals(owner)
-				&& viewer.hasPermission("adventurelog.manage.other") || viewer.getUniqueId().equals(owner)
-				&& (plugin.getPermittedPersonalWarps(viewer) > 0
+				&& viewer.hasPermission(AdvLogPerms.MANAGE_PLAYER) || viewer.getUniqueId().equals(owner)
+				&& (AdvLogPerms.getPermittedPersonalWarps(plugin.getConfig(), viewer) > 0
 				|| plugin.getDataManager().getUserData(owner).getUserWaypoints().size() > 0))) {
 			targetUI.setNavButton(4, getButton(plugin, owner));
 		}

@@ -5,6 +5,7 @@ import com.github.jikoo.data.ServerWaypoint;
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.util.ItemUtil;
+import com.github.jikoo.util.AdvLogPerms;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -34,7 +35,7 @@ public class ServerWaypointEditor extends SimpleUI {
 			@NotNull Player viewer,
 			@NotNull AdventureLogPlugin plugin,
 			@NotNull UUID owner) {
-		if (!(targetUI instanceof  ServerWaypointEditor) && viewer.hasPermission("adventurelog.manage.server")) {
+		if (!(targetUI instanceof  ServerWaypointEditor) && viewer.hasPermission(AdvLogPerms.MANAGE_SERVER)) {
 			targetUI.setNavButton(0, getButton(plugin, owner));
 		}
 	}

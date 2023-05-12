@@ -3,37 +3,4 @@ main: com.github.jikoo.AdventureLogPlugin
 version: ${project.version}
 author: Jikoo
 description: Exploration-based waypoints!
-api-version: "1.18"
-
-permissions:
-  adventurelog.*:
-    default: op
-    children:
-      adventurelog.givelog: true
-      adventurelog.givelog.other: true
-      adventurelog.unlockwaypoint: true
-      adventurelog.lockwaypoint: true
-      adventurelog.view.other: true
-      adventurelog.manage.server: true
-      adventurelog.manage.other: true
-      adventurelog.personal.unlimited: true
-
-commands:
-  givelog:
-    description: Give a user an Adventure Log.
-    usage: /<command> [player]
-    permission: adventurelog.givelog
-  openlog:
-    description: Open the Adventure Log interface.
-    usage: /<command> [player]
-    permission: adventurelog.openlog
-  unlocklogwaypoint:
-    aliases: [unlockwaypoint]
-    description: Unlock a new Adventure Log waypoint
-    usage: /<command> <player> <name>
-    permission: adventurelog.unlockwaypoint
-  locklogwaypoint:
-    aliases: [lockwaypoint]
-    description: Lock an Adventure Log waypoint
-    usage: /<command> <player> <name>
-    permission: adventurelog.lockwaypoint
+api-version: "1.19"
