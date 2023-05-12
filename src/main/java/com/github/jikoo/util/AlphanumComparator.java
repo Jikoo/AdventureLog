@@ -21,9 +21,6 @@
  */
 package com.github.jikoo.util;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Comparator;
 
 /**
@@ -40,14 +37,14 @@ import java.util.Comparator;
  */
 public class AlphanumComparator implements Comparator<String> {
 
-  private final @Nullable Comparator<Object> stringComparator;
+  private final Comparator<Object> stringComparator;
 
   /**
    * Construct a new AlphanumComparator instance with specific non-numeric ordering.
    *
    * @param stringComparator the {@link Comparator} used for ordering
    */
-  public AlphanumComparator(@Nullable Comparator<Object> stringComparator) {
+  public AlphanumComparator(Comparator<Object> stringComparator) {
     this.stringComparator = stringComparator;
   }
 
@@ -63,7 +60,7 @@ public class AlphanumComparator implements Comparator<String> {
   }
 
   /** Length of string is passed in for improved efficiency (only need to calculate it once) **/
-  private @NotNull String getChunk(@NotNull String s, int slength, int marker) {
+  private String getChunk(String s, int slength, int marker) {
     StringBuilder chunk = new StringBuilder();
     char c = s.charAt(marker);
     chunk.append(c);
@@ -79,7 +76,7 @@ public class AlphanumComparator implements Comparator<String> {
     return chunk.toString();
   }
 
-  private int getFirstNonZero(@NotNull String string, int len) {
+  private int getFirstNonZero(String string, int len) {
     for (int firstNonZero = 0; firstNonZero < len; ++firstNonZero) {
       if (string.charAt(firstNonZero) != '0') {
         return firstNonZero;
@@ -92,8 +89,8 @@ public class AlphanumComparator implements Comparator<String> {
    * Compare two strings containing numbers. Returns a negative integer, zero, or a positive
    * integer as the first argument is less than, equal to, or greater than the second.
    *
-   * <p>This comparator uses null-first ordering. If null values are to be sorted last, wrap with
-   * {@link Comparator#nullsLast(Comparator)}.</p>
+   * <p>This comparator does not allow null values. Use {@link Comparator#nullsFirst(Comparator)} or
+   * {@link Comparator#nullsLast(Comparator)} to handle null values according to preference.</p>
    *
    * <p>Note: this comparator may impose orderings that are inconsistent with equals.</p>
    *
@@ -101,14 +98,9 @@ public class AlphanumComparator implements Comparator<String> {
    * @param s2 the second object to be compared.
    * @return a negative integer, zero, or a positive integer as the first argument is less than,
    *         equal to, or greater than the second.
+   * @throws NullPointerException if either argument is null.
    */
-  public int compare(@Nullable String s1, @Nullable String s2) {
-    if (s1 == null) {
-      return s2 == null ? 0 : -1;
-    } else if (s2 == null) {
-      return 1;
-    }
-
+  public int compare(String s1, String s2) {
     int thisMarker = 0;
     int thatMarker = 0;
     int s1Length = s1.length();
