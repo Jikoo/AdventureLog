@@ -88,6 +88,15 @@ public class AlphanumComparator implements Comparator<String> {
     return chunk.toString();
   }
 
+  private int getFirstNonZero(@NotNull String string, int len) {
+    for (int firstNonZero = 0; firstNonZero < len; ++firstNonZero) {
+      if (string.charAt(firstNonZero) != '0') {
+        return firstNonZero;
+      }
+    }
+    return len;
+  }
+
   /**
    * Compare two strings containing numbers. Returns a negative integer, zero, or a positive
    * integer as the first argument is less than, equal to, or greater than the second.
@@ -116,21 +125,30 @@ public class AlphanumComparator implements Comparator<String> {
 
     while (thisMarker < s1Length && thatMarker < s2Length) {
       String thisChunk = getChunk(s1, s1Length, thisMarker);
-      thisMarker += thisChunk.length();
+      int thisChunkLength = thisChunk.length();
+      thisMarker += thisChunkLength;
 
       String thatChunk = getChunk(s2, s2Length, thatMarker);
-      thatMarker += thatChunk.length();
+      int thatChunkLength = thatChunk.length();
+      thatMarker += thatChunkLength;
 
       // If both chunks contain numeric characters, sort them numerically
       int result;
       if (isDigit(thisChunk.charAt(0)) && isDigit(thatChunk.charAt(0))) {
-        // Simple chunk comparison by length.
-        int thisChunkLength = thisChunk.length();
-        result = thisChunkLength - thatChunk.length();
+        // Start with a simple chunk comparison by length.
+        result = thisChunkLength - thatChunkLength;
+        int thisIndex = 0;
+        int thatIndex = 0;
+        // If chunks are not of the same length, a preceding zero will cause inaccuracies, i.e. "01" vs "2".
+        if (result != 0) {
+          thisIndex = getFirstNonZero(thisChunk, thisChunkLength);
+          thatIndex = getFirstNonZero(thatChunk, thatChunkLength);
+          result = (thisChunkLength - thisIndex) - (thatChunkLength - thatIndex);
+        }
         // If equal, the first different number counts
         if (result == 0) {
-          for (int i = 0; i < thisChunkLength; i++) {
-            result = thisChunk.charAt(i) - thatChunk.charAt(i);
+          for (; thisIndex < thisChunkLength; ++thisIndex, ++thatIndex) {
+            result = thisChunk.charAt(thisIndex) - thatChunk.charAt(thatIndex);
             if (result != 0) {
               return result;
             }
