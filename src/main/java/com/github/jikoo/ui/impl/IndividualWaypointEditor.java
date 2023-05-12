@@ -400,7 +400,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 		list.add(Component.text().color(NamedTextColor.RED)
 				.append(
 						Component.text("Drop to delete ("),
-						Component.translatable("key.drop"),
+						Component.keybind("key.drop"),
 						Component.text(')'))
 				.build());
 		return ItemUtil.insertText(waypoint.getIcon().clone(), list);

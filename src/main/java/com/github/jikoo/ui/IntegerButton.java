@@ -92,14 +92,14 @@ public class IntegerButton extends Button {
 		components.add(Component.text().color(NamedTextColor.WHITE)
 				.append(
 						Component.text("Drop ("),
-						Component.translatable("key.drop"),
+						Component.keybind("key.drop"),
 						Component.text("): "),
 						Component.text("+100").color(NamedTextColor.GOLD))
 				.build());
 		components.add(Component.text().color(NamedTextColor.WHITE)
 				.append(
 						Component.text("Drop stack (ctrl+"),
-						Component.translatable("key.drop"),
+						Component.keybind("key.drop"),
 						Component.text("): "),
 						Component.text("-100").color(NamedTextColor.GOLD))
 				.build());

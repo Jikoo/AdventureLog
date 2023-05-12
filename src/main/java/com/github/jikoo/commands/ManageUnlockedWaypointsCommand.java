@@ -24,7 +24,6 @@ abstract class ManageUnlockedWaypointsCommand extends PluginCommand<AdventureLog
 		super(plugin, command);
 		setUsage("/<command> <player> <waypoint>");
 
-
 		Permission parent = AdvLogPerms.getOrCreate("manage");
 		Permission child = AdvLogPerms.defineChild(parent, "discovery");
 		child.setDescription("Permission to spawn adventure logs for self.");
