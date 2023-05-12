@@ -59,7 +59,7 @@ public class AlphanumComparator implements Comparator<String> {
   }
 
   private boolean isDigit(char ch) {
-    return ((ch >= 48) && (ch <= 57));
+    return '0' <= ch && ch <= '9';
   }
 
   /** Length of string is passed in for improved efficiency (only need to calculate it once) **/
@@ -67,23 +67,14 @@ public class AlphanumComparator implements Comparator<String> {
     StringBuilder chunk = new StringBuilder();
     char c = s.charAt(marker);
     chunk.append(c);
-    marker++;
-    if (isDigit(c)) {
-      while (marker < slength) {
-        c = s.charAt(marker);
-        if (!isDigit(c))
-          break;
-        chunk.append(c);
-        marker++;
+    ++marker;
+    boolean expectingDigit = isDigit(c);
+    for (; marker < slength; ++marker) {
+      c = s.charAt(marker);
+      if (expectingDigit != isDigit(c)) {
+        break;
       }
-    } else {
-      while (marker < slength) {
-        c = s.charAt(marker);
-        if (isDigit(c))
-          break;
-        chunk.append(c);
-        marker++;
-      }
+      chunk.append(c);
     }
     return chunk.toString();
   }
