@@ -40,6 +40,24 @@ import java.util.Comparator;
  */
 public class AlphanumComparator implements Comparator<String> {
 
+  private final @Nullable Comparator<Object> stringComparator;
+
+  /**
+   * Construct a new AlphanumComparator instance with specific non-numeric ordering.
+   *
+   * @param stringComparator the {@link Comparator} used for ordering
+   */
+  public AlphanumComparator(@Nullable Comparator<Object> stringComparator) {
+    this.stringComparator = stringComparator;
+  }
+
+  /**
+   * Construct a new AlphanumComparator instance using default non-numeric ordering.
+   */
+  public AlphanumComparator() {
+    this.stringComparator = null;
+  }
+
   private boolean isDigit(char ch) {
     return ((ch >= 48) && (ch <= 57));
   }
@@ -76,6 +94,8 @@ public class AlphanumComparator implements Comparator<String> {
    *
    * <p>This comparator uses null-first ordering. If null values are to be sorted last, wrap with
    * {@link Comparator#nullsLast(Comparator)}.</p>
+   *
+   * <p>Note: this comparator may impose orderings that are inconsistent with equals.</p>
    *
    * @param s1 the first object to be compared.
    * @param s2 the second object to be compared.
@@ -116,6 +136,8 @@ public class AlphanumComparator implements Comparator<String> {
             }
           }
         }
+      } else if (stringComparator != null) {
+        result = stringComparator.compare(s1, s2);
       } else {
         result = thisChunk.compareTo(thatChunk);
       }
