@@ -36,7 +36,7 @@ public class UserWaypointUI extends SimpleUI {
 					&& !plugin.getConfig().getBoolean("personal.respawn-point.default-to-spawn")) {
 				addButton(
 						new Button(
-								ItemUtil.getItem(Material.BARRIER, Component.text("No Respawn Point").color(NamedTextColor.RED)),
+								ItemUtil.getItem(Material.BARRIER, ItemUtil.text("No Respawn Point").color(NamedTextColor.RED)),
 								event -> {}));
 			} else {
 				// TODO charge respawn anchor
@@ -86,7 +86,7 @@ public class UserWaypointUI extends SimpleUI {
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(
-				ItemUtil.getItem(Material.RED_BED, Component.text("Personal Waypoints").color(NamedTextColor.GOLD)),
+				ItemUtil.getItem(Material.RED_BED, ItemUtil.text("Personal Waypoints").color(NamedTextColor.GOLD)),
 				event -> {
 					if (event.getWhoClicked() instanceof Player player) {
 						player.openInventory(new UserWaypointUI(plugin, owner, player).getInventory());

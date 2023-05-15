@@ -55,7 +55,7 @@ public class UserWaypointEditor extends SimpleUI {
 
 	private static @NotNull Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(
-				ItemUtil.getItem(Material.WRITABLE_BOOK, Component.text("Edit Personal Waypoints").color(NamedTextColor.GOLD)),
+				ItemUtil.getItem(Material.WRITABLE_BOOK, ItemUtil.text("Edit Personal Waypoints").color(NamedTextColor.GOLD)),
 				event -> {
 					if (event.getWhoClicked() instanceof Player player) {
 						player.openInventory(new UserWaypointEditor(plugin, owner, player).getInventory());

@@ -6,6 +6,7 @@ import com.github.jikoo.commands.OpenLogCommand;
 import com.github.jikoo.commands.UnlockWaypointCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +49,9 @@ public class AdventureLogPlugin extends JavaPlugin {
 		ItemMeta itemMeta = waypointBook.getItemMeta();
 
 		if (itemMeta instanceof KnowledgeBookMeta bookMeta) {
-			bookMeta.displayName(Component.text("Adventure Log").color(NamedTextColor.DARK_PURPLE));
+			bookMeta.displayName(Component.text("Adventure Log")
+					.color(NamedTextColor.DARK_PURPLE)
+					.decoration(TextDecoration.ITALIC, false));
 			bookMeta.addRecipe(ADVENTURE_LOG_KEY);
 			waypointBook.setItemMeta(bookMeta);
 		}

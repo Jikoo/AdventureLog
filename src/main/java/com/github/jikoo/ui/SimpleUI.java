@@ -1,6 +1,7 @@
 package com.github.jikoo.ui;
 
 import com.github.jikoo.event.InterfacePreDrawEvent;
+import com.github.jikoo.util.ItemUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -232,12 +233,12 @@ public class SimpleUI implements InventoryHolder {
 
 	@Contract(pure = true)
 	private @NotNull Component getNavName(@NotNull String name) {
-		return Component.text(name).color(NamedTextColor.WHITE);
+		return ItemUtil.text(name);
 	}
 
 	@Contract(pure = true)
 	private @NotNull Component getNavIndex(int pageNumber, int maxPageNumber) {
-		return Component.text("  " + pageNumber + '/' + maxPageNumber).color(NamedTextColor.GOLD);
+		return ItemUtil.text( "  " + pageNumber + '/' + maxPageNumber).color(NamedTextColor.GOLD);
 	}
 
 	private @NotNull Button getNav(

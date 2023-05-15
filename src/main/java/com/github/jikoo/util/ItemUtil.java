@@ -1,9 +1,13 @@
 package com.github.jikoo.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +79,13 @@ public final class ItemUtil {
 		return itemStack;
 	}
 
+	public static @NotNull TextComponent.Builder text() {
+		return Component.text().decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE);
+	}
+
+	public static @NotNull TextComponent text(String content) {
+		return Component.text(content).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE);
+	}
 
 	private ItemUtil() {}
 

@@ -1,6 +1,7 @@
 package com.github.jikoo.data;
 
 import com.github.jikoo.util.AlphanumComparator;
+import com.github.jikoo.util.ItemUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -51,7 +52,7 @@ public class UserWaypoint extends Waypoint {
 		}
 		ItemMeta itemMeta = icon.getItemMeta();
 		if (itemMeta != null && !itemMeta.hasDisplayName()) {
-			itemMeta.displayName(Component.text("Home " + getName()).color(NamedTextColor.GOLD));
+			itemMeta.displayName(ItemUtil.text("Home " + getName()).color(NamedTextColor.GOLD));
 			icon.setItemMeta(itemMeta);
 		}
 		return icon;

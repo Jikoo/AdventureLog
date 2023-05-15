@@ -38,7 +38,7 @@ public class ServerWaypointUI extends SimpleUI {
 
 	private static @NotNull Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(
-				ItemUtil.getItem(Material.KNOWLEDGE_BOOK, Component.text("Server Waypoints").color(NamedTextColor.GOLD)),
+				ItemUtil.getItem(Material.KNOWLEDGE_BOOK, ItemUtil.text("Server Waypoints").color(NamedTextColor.GOLD)),
 				event -> {
 					if (event.getWhoClicked() instanceof Player player) {
 						player.openInventory(new ServerWaypointUI(plugin, owner, player).getInventory());

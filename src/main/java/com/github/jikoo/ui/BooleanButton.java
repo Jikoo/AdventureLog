@@ -36,12 +36,12 @@ public class BooleanButton extends Button {
 	private static ItemStack getItem(@NotNull AtomicBoolean value, @NotNull Material typeOn, @NotNull Material typeOff,
 			@NotNull String name) {
 		return ItemUtil.getItem(value.get() ? typeOn : typeOff,
-				Component.text()
+				ItemUtil.text()
 						.append(
-								Component.text(name + ": ").color(NamedTextColor.WHITE),
+								Component.text(name + ": "),
 								Component.text(value.get()).color(NamedTextColor.GOLD))
 						.build(),
-				Component.text("Click to toggle").color(NamedTextColor.WHITE));
+				ItemUtil.text().content("Click to toggle").build());
 	}
 
 }

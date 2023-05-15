@@ -1,7 +1,6 @@
 package com.github.jikoo.data;
 
 import com.github.jikoo.util.ItemUtil;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,7 +21,7 @@ public class SimpleWaypoint implements IWaypoint {
 
 	public SimpleWaypoint(@NotNull String name, @NotNull Material type, @NotNull Supplier<Location> location) {
 		this.name = name;
-		this.icon = ItemUtil.getItem(type, Component.text(name).color(NamedTextColor.GOLD));
+		this.icon = ItemUtil.getItem(type, ItemUtil.text(name).color(NamedTextColor.GOLD));
 		if (!location.get().isWorldLoaded()) {
 			throw new IllegalStateException("SimpleWaypoint location's world must be loaded!");
 		}
