@@ -11,6 +11,7 @@ import org.bukkit.block.banner.PatternType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -248,6 +249,7 @@ public class SimpleUI implements InventoryHolder {
 		ItemMeta itemMeta = itemStack.getItemMeta();
 
 		if (itemMeta instanceof BannerMeta bannerMeta) {
+			bannerMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 			bannerMeta.setPatterns(List.of(patterns));
 			bannerMeta.displayName(getNavName(name));
 			bannerMeta.lore(List.of(index));
