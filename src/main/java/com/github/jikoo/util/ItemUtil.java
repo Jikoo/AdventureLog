@@ -79,14 +79,6 @@ public final class ItemUtil {
 		return itemStack;
 	}
 
-	public static @NotNull TextComponent.Builder text() {
-		return Component.text().decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE);
-	}
-
-	public static @NotNull TextComponent text(String content) {
-		return Component.text(content).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE);
-	}
-
 	private ItemUtil() {}
 
 }

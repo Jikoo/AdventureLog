@@ -1,5 +1,9 @@
 package com.github.jikoo.util;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +38,14 @@ public final class TextUtil {
 		return String.format("%s: %sx, %sy, %sz",
 				location.getWorld() == null ? "Unloaded World" : getDisplay(location.getWorld()),
 				location.getBlockX(), location.getBlockY(), location.getBlockZ());
+	}
+
+	public static @NotNull TextComponent.Builder itemText() {
+		return Component.text().decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE);
+	}
+
+	public static @NotNull TextComponent itemText(String content) {
+		return Component.text(content).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE);
 	}
 
 	private TextUtil() {}

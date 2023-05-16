@@ -54,17 +54,17 @@ public class IndividualWaypointEditor extends SimpleUI {
 			waypointIcon = waypoint.getIcon().clone();
 			ItemUtil.insertText(
 					waypointIcon,
-					ItemUtil.text("Set Icon").color(NamedTextColor.GOLD),
-					ItemUtil.text("Click with an item"),
-					ItemUtil.text("to set waypoint item"));
+					TextUtil.itemText("Set Icon").color(NamedTextColor.GOLD),
+					TextUtil.itemText("Click with an item"),
+					TextUtil.itemText("to set waypoint item"));
 			waypointItem = waypoint.getIcon().clone();
 		} else {
 			waypointIcon = new ItemStack(Material.RED_STAINED_GLASS_PANE);
 			ItemMeta waypointMeta = waypointIcon.getItemMeta();
 			if (waypointMeta != null) {
-				waypointMeta.displayName(ItemUtil.text().content("Icon Item Unset").color(NamedTextColor.RED).build());
+				waypointMeta.displayName(TextUtil.itemText().content("Icon Item Unset").color(NamedTextColor.RED).build());
 				waypointMeta.lore(
-						List.of(ItemUtil.text("Click with an item"), ItemUtil.text("to set waypoint item")));
+						List.of(TextUtil.itemText("Click with an item"), TextUtil.itemText("to set waypoint item")));
 			}
 			waypointIcon.setItemMeta(waypointMeta);
 			waypointItem = new ItemStack(Material.AIR);
@@ -86,9 +86,9 @@ public class IndividualWaypointEditor extends SimpleUI {
 			waypointIcon.setItemMeta(newMeta != null ? newMeta.clone() : null);
 			ItemUtil.insertText(
 					waypointIcon,
-					ItemUtil.text("Set Waypoint Icon").color(NamedTextColor.GOLD),
-					ItemUtil.text("Click with an item"),
-					ItemUtil.text("to set waypoint item"));
+					TextUtil.itemText("Set Waypoint Icon").color(NamedTextColor.GOLD),
+					TextUtil.itemText("Click with an item"),
+					TextUtil.itemText("to set waypoint item"));
 			if (waypoint != null) {
 				waypoint.setIcon(newItem);
 			} else {
@@ -104,11 +104,11 @@ public class IndividualWaypointEditor extends SimpleUI {
 		if (waypoint != null) {
 			addButton(new Button(() -> ItemUtil.getItem(
 					Material.ARMOR_STAND,
-					ItemUtil.text("Set Location").color(NamedTextColor.GOLD),
-					ItemUtil.text("Right click to set"),
-					ItemUtil.text("to current position."),
-					ItemUtil.text().build(),
-					ItemUtil.text().append(
+					TextUtil.itemText("Set Location").color(NamedTextColor.GOLD),
+					TextUtil.itemText("Right click to set"),
+					TextUtil.itemText("to current position."),
+					TextUtil.itemText().build(),
+					TextUtil.itemText().append(
 							Component.text("Current: "),
 							Component.text(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD)).build()),
 					event -> {
@@ -140,7 +140,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 				if (serverWP != null) {
 					serverWP.setRange(value.get());
 				}
-			}, "Discovery Range", ItemUtil.text("0 = Disable discovery").color(NamedTextColor.GOLD)));
+			}, "Discovery Range", TextUtil.itemText("0 = Disable discovery").color(NamedTextColor.GOLD)));
 
 			// BUTTON: Set default discovered
 			defaultDiscovered = new AtomicBoolean(serverWP != null && serverWP.isDefault());
@@ -161,9 +161,9 @@ public class IndividualWaypointEditor extends SimpleUI {
 			ItemStack finalizeItem = new ItemStack(Material.END_CRYSTAL);
 			ItemMeta finalizeItemMeta = finalizeItem.getItemMeta();
 			if (finalizeItemMeta != null) {
-				finalizeItemMeta.displayName(ItemUtil.text("Finish " + (waypoint != null ? "Editing" : "Creation")).color(NamedTextColor.GREEN));
+				finalizeItemMeta.displayName(TextUtil.itemText("Finish " + (waypoint != null ? "Editing" : "Creation")).color(NamedTextColor.GREEN));
 				if (waypoint == null && waypointItem.getType() == Material.AIR) {
-					finalizeItemMeta.lore(List.of(ItemUtil.text("Waypoint item not set!").color(NamedTextColor.RED)));
+					finalizeItemMeta.lore(List.of(TextUtil.itemText("Waypoint item not set!").color(NamedTextColor.RED)));
 				}
 			}
 			finalizeItem.setItemMeta(finalizeItemMeta);
@@ -359,7 +359,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 				hint = "New Waypoint Editor";
 			}
 
-			return ItemUtil.getItem(Material.WRITABLE_BOOK, ItemUtil.text(hint).color(NamedTextColor.GOLD));
+			return ItemUtil.getItem(Material.WRITABLE_BOOK, TextUtil.itemText(hint).color(NamedTextColor.GOLD));
 		}
 
 		if (waypoint.isInvalid()) {
@@ -368,40 +368,40 @@ public class IndividualWaypointEditor extends SimpleUI {
 		}
 
 		List<Component> list = new ArrayList<>();
-		list.add(ItemUtil.text()
+		list.add(TextUtil.itemText()
 				.append(
 						Component.text("Edit waypoint: "),
 						Component.text(waypoint.getName()).color(NamedTextColor.GOLD))
 				.build());
-		list.add(ItemUtil.text().content(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD).build());
+		list.add(TextUtil.itemText().content(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD).build());
 		if (waypoint instanceof ServerWaypoint serverWaypoint) {
-			list.add(ItemUtil.text()
+			list.add(TextUtil.itemText()
 					.append(
 							Component.text("Priority: "),
 							Component.text(serverWaypoint.getPriority()).color(NamedTextColor.GOLD))
 					.build());
-			list.add(ItemUtil.text()
+			list.add(TextUtil.itemText()
 					.append(
 							Component.text("Discovery range: "),
 							Component.text(serverWaypoint.getRangeSquared() < 1 ? -1 : (int) Math.sqrt(serverWaypoint.getRangeSquared()))
 									.color(NamedTextColor.GOLD))
 					.build());
-			list.add(ItemUtil.text()
+			list.add(TextUtil.itemText()
 					.append(
 							Component.text("Always Discovered: "),
 							Component.text(serverWaypoint.isDefault()).color(NamedTextColor.GOLD))
 					.build());
-			list.add(ItemUtil.text().build());
-			list.add(ItemUtil.text()
+			list.add(TextUtil.itemText().build());
+			list.add(TextUtil.itemText()
 					.append(
 							Component.text("Unlocked for " + getName(owner) + ": "),
 							Component.text(plugin.getDataManager().getUserData(owner).getUnlocked().contains(waypoint.getName()))
 									.color(NamedTextColor.GOLD))
 					.build());
-			list.add(ItemUtil.text("  (Shift + right click to toggle)").color(NamedTextColor.GOLD));
+			list.add(TextUtil.itemText("  (Shift + right click to toggle)").color(NamedTextColor.GOLD));
 		}
-		list.add(ItemUtil.text().build());
-		list.add(ItemUtil.text().color(NamedTextColor.RED)
+		list.add(TextUtil.itemText().build());
+		list.add(TextUtil.itemText().color(NamedTextColor.RED)
 				.append(
 						Component.text("Drop to delete ("),
 						Component.keybind("key.drop"),

@@ -1,6 +1,7 @@
 package com.github.jikoo.ui;
 
 import com.github.jikoo.util.ItemUtil;
+import com.github.jikoo.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -85,18 +86,18 @@ public class IntegerButton extends Button {
 			@NotNull String name,
 			@NotNull Component @NotNull ... additionalInfo) {
 		List<Component> components = new ArrayList<>();
-		components.add(ItemUtil.text().append(Component.text(name + ": "), Component.text(value.get()).color(NamedTextColor.GOLD)).build());
-		components.add(ItemUtil.text().append(Component.text("Left click: "), Component.text("+1").color(NamedTextColor.GOLD)).build());
-		components.add(ItemUtil.text().append(Component.text("Right click: "), Component.text("-1").color(NamedTextColor.GOLD)).build());
-		components.add(ItemUtil.text().append(Component.text("Shift+click: "), Component.text("±10").color(NamedTextColor.GOLD)).build());
-		components.add(ItemUtil.text()
+		components.add(TextUtil.itemText().append(Component.text(name + ": "), Component.text(value.get()).color(NamedTextColor.GOLD)).build());
+		components.add(TextUtil.itemText().append(Component.text("Left click: "), Component.text("+1").color(NamedTextColor.GOLD)).build());
+		components.add(TextUtil.itemText().append(Component.text("Right click: "), Component.text("-1").color(NamedTextColor.GOLD)).build());
+		components.add(TextUtil.itemText().append(Component.text("Shift+click: "), Component.text("±10").color(NamedTextColor.GOLD)).build());
+		components.add(TextUtil.itemText()
 				.append(
 						Component.text("Drop ("),
 						Component.keybind("key.drop"),
 						Component.text("): "),
 						Component.text("+100").color(NamedTextColor.GOLD))
 				.build());
-		components.add(ItemUtil.text()
+		components.add(TextUtil.itemText()
 				.append(
 						Component.text("Drop stack (ctrl+"),
 						Component.keybind("key.drop"),

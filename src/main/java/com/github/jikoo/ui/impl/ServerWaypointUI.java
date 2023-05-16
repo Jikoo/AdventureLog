@@ -5,6 +5,7 @@ import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.ui.TeleportButton;
 import com.github.jikoo.util.ItemUtil;
+import com.github.jikoo.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -38,7 +39,7 @@ public class ServerWaypointUI extends SimpleUI {
 
 	private static @NotNull Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(
-				ItemUtil.getItem(Material.KNOWLEDGE_BOOK, ItemUtil.text("Server Waypoints").color(NamedTextColor.GOLD)),
+				ItemUtil.getItem(Material.KNOWLEDGE_BOOK, TextUtil.itemText("Server Waypoints").color(NamedTextColor.GOLD)),
 				event -> {
 					if (event.getWhoClicked() instanceof Player player) {
 						player.openInventory(new ServerWaypointUI(plugin, owner, player).getInventory());

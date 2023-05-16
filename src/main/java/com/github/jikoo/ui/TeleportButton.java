@@ -37,8 +37,8 @@ public class TeleportButton extends Button {
 	private static @NotNull ItemStack getItem(@NotNull IWaypoint waypoint) {
 		return ItemUtil.appendText(
 				waypoint.getIcon().clone(),
-				ItemUtil.text(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD),
-				ItemUtil.text("Click to teleport").color(NamedTextColor.GOLD));
+				TextUtil.itemText(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD),
+				TextUtil.itemText("Click to teleport").color(NamedTextColor.GOLD));
 	}
 
 }
