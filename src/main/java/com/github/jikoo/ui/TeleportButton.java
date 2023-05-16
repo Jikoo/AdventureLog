@@ -3,7 +3,6 @@ package com.github.jikoo.ui;
 import com.github.jikoo.data.IWaypoint;
 import com.github.jikoo.event.DelayedTeleportEvent;
 import com.github.jikoo.util.DelayedTeleport;
-import com.github.jikoo.util.ItemUtil;
 import com.github.jikoo.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,7 +34,7 @@ public class TeleportButton extends Button {
 	}
 
 	private static @NotNull ItemStack getItem(@NotNull IWaypoint waypoint) {
-		return ItemUtil.appendText(
+		return TextUtil.appendText(
 				waypoint.getIcon().clone(),
 				TextUtil.itemText(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD),
 				TextUtil.itemText("Click to teleport").color(NamedTextColor.GOLD));

@@ -1,6 +1,6 @@
 package com.github.jikoo.data;
 
-import com.github.jikoo.util.ItemUtil;
+import com.github.jikoo.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,7 +14,7 @@ public interface IWaypoint {
 	@NotNull Location getLocation();
 
 	default @NotNull ItemStack getIcon() {
-		return ItemUtil.getItem(
+		return TextUtil.getTextItem(
 				Material.DIRT,
 				Component.text(getName()),
 				Component.text("Something went wrong loading icon!"),

@@ -4,7 +4,6 @@ import com.github.jikoo.AdventureLogPlugin;
 import com.github.jikoo.data.ServerWaypoint;
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
-import com.github.jikoo.util.ItemUtil;
 import com.github.jikoo.util.AdvLogPerms;
 import com.github.jikoo.util.TextUtil;
 import net.kyori.adventure.text.Component;
@@ -43,7 +42,7 @@ public class ServerWaypointEditor extends SimpleUI {
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(
-				ItemUtil.getItem(Material.WRITABLE_BOOK, TextUtil.itemText("Edit Server Waypoints").color(NamedTextColor.GOLD)),
+				TextUtil.getTextItem(Material.WRITABLE_BOOK, TextUtil.itemText("Edit Server Waypoints").color(NamedTextColor.GOLD)),
 				event -> {
 					if (event.getWhoClicked() instanceof Player player) {
 						player.openInventory(new ServerWaypointEditor(plugin, owner, player).getInventory());

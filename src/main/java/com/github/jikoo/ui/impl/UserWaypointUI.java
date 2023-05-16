@@ -5,7 +5,6 @@ import com.github.jikoo.data.SimpleWaypoint;
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.SimpleUI;
 import com.github.jikoo.ui.TeleportButton;
-import com.github.jikoo.util.ItemUtil;
 import com.github.jikoo.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -37,7 +36,7 @@ public class UserWaypointUI extends SimpleUI {
 					&& !plugin.getConfig().getBoolean("personal.respawn-point.default-to-spawn")) {
 				addButton(
 						new Button(
-								ItemUtil.getItem(Material.BARRIER, TextUtil.itemText("No Respawn Point").color(NamedTextColor.RED)),
+								TextUtil.getTextItem(Material.BARRIER, TextUtil.itemText("No Respawn Point").color(NamedTextColor.RED)),
 								event -> {}));
 			} else {
 				// TODO charge respawn anchor
@@ -87,7 +86,7 @@ public class UserWaypointUI extends SimpleUI {
 
 	private static Button getButton(@NotNull AdventureLogPlugin plugin, @NotNull UUID owner) {
 		return new Button(
-				ItemUtil.getItem(Material.RED_BED, TextUtil.itemText("Personal Waypoints").color(NamedTextColor.GOLD)),
+				TextUtil.getTextItem(Material.RED_BED, TextUtil.itemText("Personal Waypoints").color(NamedTextColor.GOLD)),
 				event -> {
 					if (event.getWhoClicked() instanceof Player player) {
 						player.openInventory(new UserWaypointUI(plugin, owner, player).getInventory());

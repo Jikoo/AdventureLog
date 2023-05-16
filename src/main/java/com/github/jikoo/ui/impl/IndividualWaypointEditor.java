@@ -9,7 +9,6 @@ import com.github.jikoo.ui.BooleanButton;
 import com.github.jikoo.ui.Button;
 import com.github.jikoo.ui.IntegerButton;
 import com.github.jikoo.ui.SimpleUI;
-import com.github.jikoo.util.ItemUtil;
 import com.github.jikoo.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -52,7 +51,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 		ItemStack waypointItem;
 		if (waypoint != null) {
 			waypointIcon = waypoint.getIcon().clone();
-			ItemUtil.insertText(
+			TextUtil.insertText(
 					waypointIcon,
 					TextUtil.itemText("Set Icon").color(NamedTextColor.GOLD),
 					TextUtil.itemText("Click with an item"),
@@ -84,7 +83,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 			waypointIcon.setAmount(newItem.getAmount());
 			ItemMeta newMeta = newItem.getItemMeta();
 			waypointIcon.setItemMeta(newMeta != null ? newMeta.clone() : null);
-			ItemUtil.insertText(
+			TextUtil.insertText(
 					waypointIcon,
 					TextUtil.itemText("Set Waypoint Icon").color(NamedTextColor.GOLD),
 					TextUtil.itemText("Click with an item"),
@@ -102,7 +101,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 
 		// BUTTON: Set location
 		if (waypoint != null) {
-			addButton(new Button(() -> ItemUtil.getItem(
+			addButton(new Button(() -> TextUtil.getTextItem(
 					Material.ARMOR_STAND,
 					TextUtil.itemText("Set Location").color(NamedTextColor.GOLD),
 					TextUtil.itemText("Right click to set"),
@@ -359,7 +358,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 				hint = "New Waypoint Editor";
 			}
 
-			return ItemUtil.getItem(Material.WRITABLE_BOOK, TextUtil.itemText(hint).color(NamedTextColor.GOLD));
+			return TextUtil.getTextItem(Material.WRITABLE_BOOK, TextUtil.itemText(hint).color(NamedTextColor.GOLD));
 		}
 
 		if (waypoint.isInvalid()) {
@@ -407,7 +406,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 						Component.keybind("key.drop"),
 						Component.text(')'))
 				.build());
-		return ItemUtil.insertText(waypoint.getIcon().clone(), list);
+		return TextUtil.insertText(waypoint.getIcon().clone(), list);
 	}
 
 	private static String getName(UUID uuid) {

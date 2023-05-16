@@ -1,6 +1,5 @@
 package com.github.jikoo.ui;
 
-import com.github.jikoo.util.ItemUtil;
 import com.github.jikoo.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -106,7 +105,7 @@ public class IntegerButton extends Button {
 				.build());
 
 		components.addAll(List.of(additionalInfo));
-		return ItemUtil.getItem(type, components);
+		return TextUtil.getTextItem(type, components);
 	}
 
 }
