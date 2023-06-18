@@ -12,35 +12,60 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public class AdventureLogListener implements Listener {
 
 	private final AdventureLogPlugin plugin;
+	private final Class<?> craftInventoryCustom;
 
-	AdventureLogListener(AdventureLogPlugin plugin) {
+	AdventureLogListener(@NotNull AdventureLogPlugin plugin) {
 		this.plugin = plugin;
+		Class<?> clazz = null;
+		try {
+			clazz = Class.forName(plugin.getServer().getClass().getPackageName() + ".inventory.CraftInventoryCustom");
+		} catch (ClassNotFoundException e) {
+			plugin.getLogger().warning("Unable to locate CraftInventoryCustom class, performance will be degraded!");
+		}
+		craftInventoryCustom = clazz;
+	}
+
+	private boolean isNonCustomInventory(@NotNull Inventory inventory) {
+		if (craftInventoryCustom == null) {
+			return inventory.getLocation() != null;
+		} else {
+			return !craftInventoryCustom.isInstance(inventory);
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onInventoryClick(@NotNull InventoryClickEvent event) {
-		if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
-			((SimpleUI) event.getView().getTopInventory().getHolder()).handleClick(event);
+		Inventory topInventory = event.getView().getTopInventory();
+		if (isNonCustomInventory(topInventory)) {
+			return;
+		}
+		if (topInventory.getHolder() instanceof SimpleUI) {
+			((SimpleUI) topInventory.getHolder()).handleClick(event);
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onInventoryDrag(@NotNull InventoryDragEvent event) {
-		if (!(event.getView().getTopInventory().getHolder() instanceof SimpleUI)) {
+		Inventory topInventory = event.getView().getTopInventory();
+		if (isNonCustomInventory(topInventory)) {
+			return;
+		}
+		if (!(topInventory.getHolder() instanceof SimpleUI)) {
 			return;
 		}
 
-		if (((SimpleUI) event.getView().getTopInventory().getHolder()).isActionBlocking()) {
+		if (((SimpleUI) topInventory.getHolder()).isActionBlocking()) {
 			event.setCancelled(true);
 			return;
 		}
 
-		int size = event.getView().getTopInventory().getSize();
+		int size = topInventory.getSize();
 		for (int slot : event.getRawSlots()) {
 			// TODO: InventoryDragEvent#getRawSlots is mutable, InventoryDragEvent#getNewItems is not
 			//  - possible to remove top slots instead of cancelling? Needs testing
