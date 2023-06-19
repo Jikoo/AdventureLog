@@ -32,14 +32,14 @@ public class UserWaypoint extends Waypoint {
 	}
 
 	@Override
-	public @NotNull String getName() {
+	public @NotNull String getId() {
 		String customName = this.getString("custom_name");
-		return customName != null ? customName : super.getName();
+		return customName != null ? customName : super.getId();
 	}
 
 	private @NotNull String getSortingName() {
 		String comparableName = this.getString("comparable_name");
-		return comparableName != null ? comparableName : getName();
+		return comparableName != null ? comparableName : this.getId();
 	}
 
 	@Override
@@ -47,12 +47,12 @@ public class UserWaypoint extends Waypoint {
 		ItemStack icon = this.getItemStack("icon");
 		if (icon == null || icon.getType().isAir()) {
 			List<Material> values = new ArrayList<>(Tag.BEDS.getValues());
-			int index = getName().hashCode() % values.size();
+			int index = this.getId().hashCode() % values.size();
 			icon = new ItemStack(values.get(index));
 		}
 		ItemMeta itemMeta = icon.getItemMeta();
 		if (itemMeta != null && !itemMeta.hasDisplayName()) {
-			itemMeta.displayName(TextUtil.itemText("Home " + getName()).color(NamedTextColor.GOLD));
+			itemMeta.displayName(TextUtil.itemText("Home " + this.getId()).color(NamedTextColor.GOLD));
 			icon.setItemMeta(itemMeta);
 		}
 		return icon;

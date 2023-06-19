@@ -84,7 +84,7 @@ public class UserData extends YamlData {
 	}
 
 	void notifyDelete(@NotNull UserWaypoint waypoint) {
-		this.waypoints.remove(waypoint.getName());
+		this.waypoints.remove(waypoint.getId());
 	}
 
 	public boolean unlockWaypoint(@NotNull String waypointName) {

@@ -90,7 +90,7 @@ abstract class ManageUnlockedWaypointsCommand extends PluginCommand<AdventureLog
 
 			Collection<ServerWaypoint> waypoints = getCompletableWaypoints(getPlugin().getDataManager().getUserData(target.getUniqueId()));
 
-			return waypoints.stream().map(Waypoint::getName)
+			return waypoints.stream().map(Waypoint::getId)
 					.filter(name -> StringUtil.startsWithIgnoreCase(name, args[1])).toList();
 
 		} else if (args.length == 3) {

@@ -72,7 +72,7 @@ public class DataManager {
 			for (ServerWaypoint waypoint : waypoints) {
 				if (waypoint.getRangeSquared() > -1 && player.getWorld().equals(waypoint.getLocation().getWorld())
 						&& player.getLocation().distanceSquared(waypoint.getLocation()) <= waypoint.getRangeSquared()
-						&& playerCache.getUnchecked(player.getUniqueId()).unlockWaypoint(waypoint.getName())) {
+						&& playerCache.getUnchecked(player.getUniqueId()).unlockWaypoint(waypoint.getId())) {
 					player.showTitle(Title.title(
 							Component.text("Waypoint discovered!"),
 							Component.text("Check your Adventure Log."),

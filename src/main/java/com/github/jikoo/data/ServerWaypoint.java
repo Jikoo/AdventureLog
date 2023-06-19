@@ -10,8 +10,8 @@ public final class ServerWaypoint extends Waypoint {
 
 	public static final Comparator<ServerWaypoint> COMPARATOR = Comparator.comparing(ServerWaypoint::getPriority).reversed();
 
-	ServerWaypoint(ServerData storage, String name, @NotNull ItemStack icon, @NotNull Location location) {
-		super(storage, name, icon, location);
+	ServerWaypoint(ServerData storage, String id, @NotNull ItemStack icon, @NotNull Location location) {
+		super(storage, id, icon, location);
 	}
 
 	ServerWaypoint(ServerData storage, String name) {

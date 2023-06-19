@@ -44,7 +44,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 			@NotNull Class<? extends Waypoint> waypointClazz,
 			@Nullable Waypoint waypoint,
 			@NotNull UUID owner) {
-		super(Component.text(waypoint != null ? "Modify " + waypoint.getName() : "New Waypoint Creator").color(NamedTextColor.DARK_RED), false);
+		super(Component.text(waypoint != null ? "Modify " + waypoint.getId() : "New Waypoint Creator").color(NamedTextColor.DARK_RED), false);
 
 		// BUTTON: set icon item
 		ItemStack waypointIcon;
@@ -181,13 +181,18 @@ public class IndividualWaypointEditor extends SimpleUI {
 			}
 			if (waypointItem.getType() != Material.AIR && event.getWhoClicked() instanceof Player) {
 				event.getWhoClicked().closeInventory();
-				requestWaypointName(plugin, (Player) event.getWhoClicked(), waypointItem, priority, range, defaultDiscovered);
+				requestWaypointId(plugin, (Player) event.getWhoClicked(), waypointItem, priority, range, defaultDiscovered);
 			}
 		}));
 	}
 
-	private static void requestWaypointName(@NotNull AdventureLogPlugin plugin, @NotNull Player player, @NotNull ItemStack waypointItem,
-			@Nullable AtomicInteger priority, @Nullable AtomicInteger range, @Nullable AtomicBoolean defaultDiscovered) {
+	private static void requestWaypointId(
+			@NotNull AdventureLogPlugin plugin,
+			@NotNull Player player,
+			@NotNull ItemStack waypointItem,
+			@Nullable AtomicInteger priority,
+			@Nullable AtomicInteger range,
+			@Nullable AtomicBoolean defaultDiscovered) {
 		Conversation conversation = new ConversationFactory(plugin).withLocalEcho(false).withModality(false).withFirstPrompt(new Prompt() {
 			@NotNull
 			@Override
@@ -321,10 +326,10 @@ public class IndividualWaypointEditor extends SimpleUI {
 			if (event.getClick() == ClickType.SHIFT_RIGHT && waypoint instanceof ServerWaypoint) {
 				UserData userData = plugin.getDataManager().getUserData(owner);
 				List<String> unlocked = userData.getUnlocked();
-				if (unlocked.contains(waypoint.getName())) {
-					unlocked.remove(waypoint.getName());
+				if (unlocked.contains(waypoint.getId())) {
+					unlocked.remove(waypoint.getId());
 				} else {
-					unlocked.add(waypoint.getName());
+					unlocked.add(waypoint.getId());
 				}
 				userData.setUnlocked(unlocked);
 
@@ -370,7 +375,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 		list.add(TextUtil.itemText()
 				.append(
 						Component.text("Edit waypoint: "),
-						Component.text(waypoint.getName()).color(NamedTextColor.GOLD))
+						Component.text(waypoint.getId()).color(NamedTextColor.GOLD))
 				.build());
 		list.add(TextUtil.itemText().content(TextUtil.getDisplay(waypoint.getLocation())).color(NamedTextColor.GOLD).build());
 		if (waypoint instanceof ServerWaypoint serverWaypoint) {
@@ -394,7 +399,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 			list.add(TextUtil.itemText()
 					.append(
 							Component.text("Unlocked for " + getName(owner) + ": "),
-							Component.text(plugin.getDataManager().getUserData(owner).getUnlocked().contains(waypoint.getName()))
+							Component.text(plugin.getDataManager().getUserData(owner).getUnlocked().contains(waypoint.getId()))
 									.color(NamedTextColor.GOLD))
 					.build());
 			list.add(TextUtil.itemText("  (Shift + right click to toggle)").color(NamedTextColor.GOLD));

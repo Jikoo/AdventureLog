@@ -99,27 +99,27 @@ public class ServerData extends YamlData {
 
 	void notifyRangeUpdate(@NotNull ServerWaypoint waypoint) {
 		if (waypoint.getRangeSquared() < 1) {
-			this.discoverableWaypoints.remove(waypoint.getName());
+			this.discoverableWaypoints.remove(waypoint.getId());
 		}
-		this.discoverableWaypoints.add(waypoint.getName());
+		this.discoverableWaypoints.add(waypoint.getId());
 	}
 
 	void notifyDefaultUpdate(@NotNull ServerWaypoint waypoint) {
 		if (waypoint.isDefault()) {
-			this.discoverableWaypoints.remove(waypoint.getName());
-			this.defaultWaypoints.add(waypoint.getName());
+			this.discoverableWaypoints.remove(waypoint.getId());
+			this.defaultWaypoints.add(waypoint.getId());
 			return;
 		}
 		if (waypoint.getRangeSquared() > 0) {
-			this.discoverableWaypoints.add(waypoint.getName());
+			this.discoverableWaypoints.add(waypoint.getId());
 		}
-		this.defaultWaypoints.remove(waypoint.getName());
+		this.defaultWaypoints.remove(waypoint.getId());
 	}
 
 	void notifyDelete(@NotNull ServerWaypoint waypoint) {
-		this.loadedWaypoints.remove(waypoint.getName());
-		this.defaultWaypoints.remove(waypoint.getName());
-		this.discoverableWaypoints.remove(waypoint.getName());
+		this.loadedWaypoints.remove(waypoint.getId());
+		this.defaultWaypoints.remove(waypoint.getId());
+		this.discoverableWaypoints.remove(waypoint.getId());
 	}
 
 }

@@ -1,8 +1,10 @@
 package com.github.jikoo.data;
 
 import com.google.common.base.Preconditions;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,24 +12,37 @@ import java.util.Objects;
 
 public class Waypoint extends YamlSubsetData implements IWaypoint {
 
-	private final String name;
+	private final String id;
 
-	public Waypoint(YamlData storage, String name, @NotNull ItemStack icon, @NotNull Location location) {
-		super(storage, "waypoints." + name);
-		this.name = name;
+	public Waypoint(YamlData storage, String id, @NotNull ItemStack icon, @NotNull Location location) {
+		super(storage, "waypoints." + id);
+		this.id = id;
 		this.setIcon(icon);
 		this.setLocation(location);
 	}
 
-	public Waypoint(YamlData storage, String name) {
-		super(storage, "waypoints." + name);
-		this.name = name;
+	public Waypoint(YamlData storage, String id) {
+		super(storage, "waypoints." + id);
+		this.id = id;
 	}
 
 	@Override
 	@NotNull
-	public String getName() {
-		return name;
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public @NotNull Component getName() {
+		ItemStack icon = this.getItemStack("icon");
+		if (icon != null && icon.hasItemMeta()) {
+			ItemMeta itemMeta = icon.getItemMeta();
+			Component name = itemMeta.displayName();
+			if (name != null) {
+				return name;
+			}
+		}
+		return Component.text(getId());
 	}
 
 	@Override
@@ -41,8 +56,7 @@ public class Waypoint extends YamlSubsetData implements IWaypoint {
 	}
 
 	@Override
-	@NotNull
-	public ItemStack getIcon() {
+	public @NotNull ItemStack getIcon() {
 		ItemStack icon = this.getItemStack("icon");
 		if (icon != null && !icon.getType().isAir()) {
 			return icon;
@@ -56,7 +70,7 @@ public class Waypoint extends YamlSubsetData implements IWaypoint {
 
 	@Override
 	public int hashCode() {
-		return this.name.hashCode();
+		return this.id.hashCode();
 	}
 
 	@Override
@@ -67,7 +81,7 @@ public class Waypoint extends YamlSubsetData implements IWaypoint {
 		if (!(obj instanceof Waypoint other)) {
 			return false;
 		}
-		return name.equals(other.name) && raw().raw().equals(other.raw().raw());
+		return id.equals(other.id) && raw().raw().equals(other.raw().raw());
 	}
 
 	public boolean isInvalid() {
