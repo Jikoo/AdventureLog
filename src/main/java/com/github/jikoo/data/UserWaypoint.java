@@ -1,6 +1,6 @@
 package com.github.jikoo.data;
 
-import com.github.jikoo.util.AlphanumComparator;
+import com.github.jikoo.planarwrappers.util.AlphanumComparator;
 import com.github.jikoo.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
