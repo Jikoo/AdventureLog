@@ -45,8 +45,8 @@ public class AdventureLogListener implements Listener {
 		if (isNonCustomInventory(topInventory)) {
 			return;
 		}
-		if (topInventory.getHolder() instanceof SimpleUI) {
-			((SimpleUI) topInventory.getHolder()).handleClick(event);
+		if (topInventory.getHolder(false) instanceof SimpleUI ui) {
+			ui.handleClick(event);
 		}
 	}
 
@@ -56,11 +56,11 @@ public class AdventureLogListener implements Listener {
 		if (isNonCustomInventory(topInventory)) {
 			return;
 		}
-		if (!(topInventory.getHolder() instanceof SimpleUI)) {
+		if (!(topInventory.getHolder(false) instanceof SimpleUI ui)) {
 			return;
 		}
 
-		if (((SimpleUI) topInventory.getHolder()).isActionBlocking()) {
+		if (ui.isActionBlocking()) {
 			event.setCancelled(true);
 			return;
 		}
