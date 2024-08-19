@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class IndividualWaypointEditor extends SimpleUI {
 
@@ -68,33 +69,31 @@ public class IndividualWaypointEditor extends SimpleUI {
 			waypointIcon.setItemMeta(waypointMeta);
 			waypointItem = new ItemStack(Material.AIR);
 		}
-		addButton(new Button(waypointIcon, event -> {
+
+		AtomicReference<ItemStack> icon = new AtomicReference<>(waypointIcon);
+		addButton(new Button(icon::get, event -> {
 			if (waypoint != null && event.getClick() == ClickType.MIDDLE && event.getWhoClicked().getGameMode() == GameMode.CREATIVE) {
-				//noinspection deprecation - works fine due to inventory updates on cancellation
+				//noinspection deprecation - works fine due to event being cancelled
 				event.setCursor(waypoint.getIcon());
 				return;
 			}
 
 			ItemStack newItem = event.getCursor();
-			if (newItem == null || newItem.getType() == Material.AIR) {
+			if (newItem.getType().isAir()) {
 				return;
 			}
-			waypointIcon.setType(newItem.getType());
-			waypointIcon.setAmount(newItem.getAmount());
-			ItemMeta newMeta = newItem.getItemMeta();
-			waypointIcon.setItemMeta(newMeta != null ? newMeta.clone() : null);
+
+			if (waypoint != null) {
+				waypoint.setIcon(newItem);
+			}
+
+			ItemStack newIcon = new ItemStack(newItem);
 			TextUtil.insertText(
-					waypointIcon,
+					newIcon,
 					TextUtil.itemText("Set Waypoint Icon").color(NamedTextColor.GOLD),
 					TextUtil.itemText("Click with an item"),
 					TextUtil.itemText("to set waypoint item"));
-			if (waypoint != null) {
-				waypoint.setIcon(newItem);
-			} else {
-				waypointItem.setType(newItem.getType());
-				waypointItem.setAmount(newItem.getAmount());
-				waypointItem.setItemMeta(newMeta != null ? newMeta.clone() : null);
-			}
+			icon.set(newIcon);
 
 			draw(event.getView().getTopInventory());
 		}));
@@ -307,14 +306,14 @@ public class IndividualWaypointEditor extends SimpleUI {
 			}
 
 			if (waypoint.isInvalid()) {
-				clicked.setType(Material.AIR);
+				event.setCurrentItem(ItemStack.of(Material.AIR));
 				return;
 			}
 
 			// Action: Delete waypoint
 			if (event.getClick() == ClickType.DROP) {
 				waypoint.delete();
-				clicked.setType(Material.AIR);
+				event.setCurrentItem(ItemStack.of(Material.AIR));
 
 				if (event.getView().getTopInventory().getHolder() instanceof SimpleUI) {
 					((SimpleUI) event.getView().getTopInventory().getHolder()).draw(event.getView().getTopInventory());

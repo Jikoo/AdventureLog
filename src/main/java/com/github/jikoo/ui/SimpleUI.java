@@ -88,7 +88,7 @@ public class SimpleUI implements InventoryHolder {
 	}
 
 	public int getHighestButton() {
-		return buttons.size() > 0 ? buttons.lastKey() : -1;
+		return !buttons.isEmpty() ? buttons.lastKey() : -1;
 	}
 
 	public void setNavButton(int slot, @Nullable Button button) {
@@ -99,7 +99,7 @@ public class SimpleUI implements InventoryHolder {
 	}
 
 	protected int getInventorySize() {
-		int highestIndex = buttons.size() > 0 ? buttons.lastKey() + 1 : 0;
+		int highestIndex = !buttons.isEmpty() ? buttons.lastKey() + 1 : 0;
 		return Math.min(54, Math.max(9, (int) Math.ceil(highestIndex / 9D) * 9 + (navigation.isEmpty() ? 0 : 9)));
 	}
 
@@ -161,7 +161,7 @@ public class SimpleUI implements InventoryHolder {
 					draw(event.getView().getTopInventory());
 				},
 				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT),
-				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT_MIRROR),
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_UP_LEFT),
 				new Pattern(DyeColor.BLACK, PatternType.STRIPE_LEFT)
 		);
 	}
@@ -181,7 +181,7 @@ public class SimpleUI implements InventoryHolder {
 					draw(event.getView().getTopInventory());
 				},
 				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT),
-				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_LEFT_MIRROR)
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_UP_LEFT)
 		);
 	}
 
@@ -204,7 +204,7 @@ public class SimpleUI implements InventoryHolder {
 					draw(event.getView().getTopInventory());
 				},
 				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT),
-				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT_MIRROR)
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_UP_RIGHT)
 		);
 	}
 
@@ -227,7 +227,7 @@ public class SimpleUI implements InventoryHolder {
 					draw(event.getView().getTopInventory());
 				},
 				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT),
-				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_RIGHT_MIRROR),
+				new Pattern(DyeColor.WHITE, PatternType.DIAGONAL_UP_RIGHT),
 				new Pattern(DyeColor.BLACK, PatternType.STRIPE_RIGHT));
 	}
 
@@ -250,7 +250,7 @@ public class SimpleUI implements InventoryHolder {
 		ItemMeta itemMeta = itemStack.getItemMeta();
 
 		if (itemMeta instanceof BannerMeta bannerMeta) {
-			bannerMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+			bannerMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 			bannerMeta.setPatterns(List.of(patterns));
 			bannerMeta.displayName(getNavName(name));
 			bannerMeta.lore(List.of(index));

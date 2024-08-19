@@ -38,11 +38,7 @@ abstract class ManageUnlockedWaypointsCommand extends PluginCommand<AdventureLog
 	abstract @NotNull Collection<ServerWaypoint> getCompletableWaypoints(@NotNull UserData userData);
 
 	@Override
-	public boolean onCommand(
-			@NotNull CommandSender sender,
-			@NotNull String alias,
-			@NotNull String[] args) {
-
+	public boolean onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
 		if (args.length < 2) {
 			return false;
 		}

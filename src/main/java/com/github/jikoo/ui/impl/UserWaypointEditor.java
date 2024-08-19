@@ -48,7 +48,7 @@ public class UserWaypointEditor extends SimpleUI {
 		if (!(targetUI instanceof UserWaypointEditor) && (!viewer.getUniqueId().equals(owner)
 				&& viewer.hasPermission(AdvLogPerms.MANAGE_PLAYER) || viewer.getUniqueId().equals(owner)
 				&& (AdvLogPerms.getPermittedPersonalWarps(plugin.getConfig(), viewer) > 0
-				|| plugin.getDataManager().getUserData(owner).getUserWaypoints().size() > 0))) {
+				|| !plugin.getDataManager().getUserData(owner).getUserWaypoints().isEmpty()))) {
 			targetUI.setNavButton(4, getButton(plugin, owner));
 		}
 	}

@@ -21,21 +21,23 @@ public final class TextUtil {
 
 	public static @NotNull String getDisplay(@NotNull World world) {
 		String name = world.getName();
-		if ("world".equals(name)) {
-			return "Overworld";
-		}
-		if ("world_nether".equals(name)) {
-			return "The Nether";
-		}
-		if ("world_the_end".equals(name)) {
-			return "The End";
+		switch (name) {
+			case "world" -> {
+				return "Overworld";
+			}
+			case "world_nether" -> {
+				return "The Nether";
+			}
+			case "world_the_end" -> {
+				return "The End";
+			}
 		}
 		StringBuilder builder = new StringBuilder();
 		for (String word : name.split("[_ ]")) {
-			if (word.length() == 0) {
+			if (word.isEmpty()) {
 				continue;
 			}
-			if (builder.length() > 0) {
+			if (!builder.isEmpty()) {
 				builder.append(' ');
 			}
 			builder.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
@@ -149,7 +151,7 @@ public final class TextUtil {
 
 		Component name = displayName.get();
 		if (name != null) {
-			components.add(0, name);
+			components.addFirst(name);
 		}
 
 		return components;
@@ -164,7 +166,7 @@ public final class TextUtil {
 
 		if (useName) {
 			// Set display name to first component and remove.
-			itemMeta.displayName(components.remove(0));
+			itemMeta.displayName(components.removeFirst());
 		}
 
 		// Set lore to remaining components.

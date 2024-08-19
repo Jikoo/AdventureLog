@@ -24,7 +24,7 @@ public class UserWaypointUI extends SimpleUI {
 		super(getName(owner));
 
 		if (plugin.getConfig().getBoolean("personal.spawn-as-waypoint")) {
-			World world = plugin.getServer().getWorlds().get(0);
+			World world = plugin.getServer().getWorlds().getFirst();
 			addButton(new TeleportButton(plugin, new SimpleWaypoint("Spawn", Material.COMPASS, world.getSpawnLocation())));
 		}
 
@@ -32,7 +32,7 @@ public class UserWaypointUI extends SimpleUI {
 			OfflinePlayer target = plugin.getServer().getOfflinePlayer(owner);
 			Location destination;
 			if (!target.isOnline() && !target.hasPlayedBefore()
-					|| (destination = target.getBedSpawnLocation()) == null
+					|| (destination = target.getRespawnLocation()) == null
 					&& !plugin.getConfig().getBoolean("personal.respawn-point.default-to-spawn")) {
 				addButton(
 						new Button(
@@ -45,7 +45,7 @@ public class UserWaypointUI extends SimpleUI {
 						Material.RESPAWN_ANCHOR,
 						() -> {
 							if (destination == null) {
-								return plugin.getServer().getWorlds().get(0).getSpawnLocation();
+								return plugin.getServer().getWorlds().getFirst().getSpawnLocation();
 							}
 							return destination;
 						})));
@@ -79,7 +79,7 @@ public class UserWaypointUI extends SimpleUI {
 				&& (viewer.getUniqueId().equals(owner) || viewer.hasPermission("adventurelog.view.other"))
 				&& (plugin.getConfig().getBoolean("personal.spawn-as-waypoint")
 						|| plugin.getConfig().getBoolean("personal.respawn-point.as-waypoint")
-						|| plugin.getDataManager().getUserData(owner).getUserWaypoints().size() > 0)) {
+						|| !plugin.getDataManager().getUserData(owner).getUserWaypoints().isEmpty())) {
 			targetUI.setNavButton(3, getButton(plugin, owner));
 		}
 	}

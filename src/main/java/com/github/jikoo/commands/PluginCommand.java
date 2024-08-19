@@ -38,12 +38,12 @@ public abstract class PluginCommand<T extends Plugin> extends Command implements
 
     boolean success;
     try {
-      success = onCommand(sender, commandLabel, args);
+      success = onCommand(sender, args);
     } catch (Throwable exception) {
       throw new CommandException("Unhandled exception executing command '" + commandLabel + "' in plugin " + this.plugin.getName(), exception);
     }
 
-    if (!success && this.usageMessage.length() > 0) {
+    if (!success && !this.usageMessage.isEmpty()) {
       String[] usage = this.usageMessage.replace("<command>", commandLabel).split("\n");
       for (String line : usage) {
         sender.sendMessage(line);
@@ -53,7 +53,7 @@ public abstract class PluginCommand<T extends Plugin> extends Command implements
     return success;
   }
 
-  protected abstract boolean onCommand(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args);
+  protected abstract boolean onCommand(@NotNull CommandSender sender, @NotNull String[] args);
 
   public final @NotNull List<String> tabComplete(
           @NotNull CommandSender sender,

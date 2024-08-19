@@ -30,10 +30,7 @@ public class GiveLogCommand extends PluginCommand<AdventureLogPlugin> {
 	}
 
 	@Override
-	public boolean onCommand(
-			@NotNull CommandSender sender,
-			@NotNull String alias,
-			@NotNull String @NotNull [] args) {
+	public boolean onCommand(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
 		if (args.length < 1 && !(sender instanceof Player)) {
 			return false;
 		}
@@ -52,7 +49,7 @@ public class GiveLogCommand extends PluginCommand<AdventureLogPlugin> {
 
 		Map<Integer, ItemStack> addFailures = target.getInventory().addItem(getPlugin().getWaypointBook());
 
-		if (addFailures.size() > 0) {
+		if (!addFailures.isEmpty()) {
 			sender.sendMessage(String.format("%s's inventory is full! ", target.getName()));
 		}
 
