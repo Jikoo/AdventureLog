@@ -18,31 +18,15 @@ import org.jetbrains.annotations.NotNull;
 public class AdventureLogListener implements Listener {
 
 	private final AdventureLogPlugin plugin;
-	private final Class<?> craftInventoryCustom;
 
 	AdventureLogListener(@NotNull AdventureLogPlugin plugin) {
 		this.plugin = plugin;
-		Class<?> clazz = null;
-		try {
-			clazz = Class.forName(plugin.getServer().getClass().getPackageName() + ".inventory.CraftInventoryCustom");
-		} catch (ClassNotFoundException e) {
-			plugin.getLogger().warning("Unable to locate CraftInventoryCustom class, performance will be degraded!");
-		}
-		craftInventoryCustom = clazz;
-	}
-
-	private boolean isNonCustomInventory(@NotNull Inventory inventory) {
-		if (craftInventoryCustom == null) {
-			return inventory.getLocation() != null;
-		} else {
-			return !craftInventoryCustom.isInstance(inventory);
-		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onInventoryClick(@NotNull InventoryClickEvent event) {
 		Inventory topInventory = event.getView().getTopInventory();
-		if (isNonCustomInventory(topInventory)) {
+		if (topInventory.getLocation() != null) {
 			return;
 		}
 		if (topInventory.getHolder(false) instanceof SimpleUI ui) {
@@ -53,7 +37,7 @@ public class AdventureLogListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onInventoryDrag(@NotNull InventoryDragEvent event) {
 		Inventory topInventory = event.getView().getTopInventory();
-		if (isNonCustomInventory(topInventory)) {
+		if (topInventory.getLocation() != null) {
 			return;
 		}
 		if (!(topInventory.getHolder(false) instanceof SimpleUI ui)) {
