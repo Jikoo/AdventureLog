@@ -47,31 +47,31 @@ public class IndividualWaypointEditor extends SimpleUI {
 			@NotNull UUID owner) {
 		super(Component.text(waypoint != null ? "Modify " + waypoint.getId() : "New Waypoint Creator").color(NamedTextColor.DARK_RED), false);
 
-		// BUTTON: set icon item
-		ItemStack waypointIcon;
-		ItemStack waypointItem;
+		// Set up holders for UI display element and actual waypoint icon.
+		AtomicReference<ItemStack> displayIcon = new AtomicReference<>();
+		AtomicReference<ItemStack> waypointIcon = new AtomicReference<>();
 		if (waypoint != null) {
-			waypointIcon = waypoint.getIcon().clone();
-			TextUtil.insertText(
-					waypointIcon,
+			displayIcon.set(TextUtil.insertText(
+					new ItemStack(waypoint.getIcon()),
 					TextUtil.itemText("Set Icon").color(NamedTextColor.GOLD),
 					TextUtil.itemText("Click with an item"),
-					TextUtil.itemText("to set waypoint item"));
-			waypointItem = waypoint.getIcon().clone();
+					TextUtil.itemText("to set waypoint item")));
+			waypointIcon.set(new ItemStack(waypoint.getIcon()));
 		} else {
-			waypointIcon = new ItemStack(Material.RED_STAINED_GLASS_PANE);
-			ItemMeta waypointMeta = waypointIcon.getItemMeta();
+			ItemStack unsetButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+			ItemMeta waypointMeta = unsetButton.getItemMeta();
 			if (waypointMeta != null) {
 				waypointMeta.displayName(TextUtil.itemText().content("Icon Item Unset").color(NamedTextColor.RED).build());
 				waypointMeta.lore(
 						List.of(TextUtil.itemText("Click with an item"), TextUtil.itemText("to set waypoint item")));
 			}
-			waypointIcon.setItemMeta(waypointMeta);
-			waypointItem = new ItemStack(Material.AIR);
+			unsetButton.setItemMeta(waypointMeta);
+			displayIcon.set(unsetButton);
+			waypointIcon.set(new ItemStack(Material.AIR));
 		}
 
-		AtomicReference<ItemStack> icon = new AtomicReference<>(waypointIcon);
-		addButton(new Button(icon::get, event -> {
+		// BUTTON: set icon item
+		addButton(new Button(displayIcon::get, event -> {
 			if (waypoint != null && event.getClick() == ClickType.MIDDLE && event.getWhoClicked().getGameMode() == GameMode.CREATIVE) {
 				//noinspection deprecation - works fine due to event being cancelled
 				event.setCursor(waypoint.getIcon());
@@ -83,17 +83,17 @@ public class IndividualWaypointEditor extends SimpleUI {
 				return;
 			}
 
+			waypointIcon.set(new ItemStack(newItem));
 			if (waypoint != null) {
+				// Note: Setting icon copies, do not need to copy twice.
 				waypoint.setIcon(newItem);
 			}
 
-			ItemStack newIcon = new ItemStack(newItem);
-			TextUtil.insertText(
-					newIcon,
+			displayIcon.set(TextUtil.insertText(
+					new ItemStack(newItem),
 					TextUtil.itemText("Set Waypoint Icon").color(NamedTextColor.GOLD),
 					TextUtil.itemText("Click with an item"),
-					TextUtil.itemText("to set waypoint item"));
-			icon.set(newIcon);
+					TextUtil.itemText("to set waypoint item")));
 
 			draw(event.getView().getTopInventory());
 		}));
@@ -160,7 +160,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 			ItemMeta finalizeItemMeta = finalizeItem.getItemMeta();
 			if (finalizeItemMeta != null) {
 				finalizeItemMeta.displayName(TextUtil.itemText("Finish " + (waypoint != null ? "Editing" : "Creation")).color(NamedTextColor.GREEN));
-				if (waypoint == null && waypointItem.getType() == Material.AIR) {
+				if (waypoint == null && waypointIcon.get().getType() == Material.AIR) {
 					finalizeItemMeta.lore(List.of(TextUtil.itemText("Waypoint item not set!").color(NamedTextColor.RED)));
 				}
 			}
@@ -178,9 +178,10 @@ public class IndividualWaypointEditor extends SimpleUI {
 				player.openInventory(ui.getInventory());
 				return;
 			}
-			if (waypointItem.getType() != Material.AIR && event.getWhoClicked() instanceof Player) {
+			ItemStack item = waypointIcon.get();
+			if (item.getType() != Material.AIR && event.getWhoClicked() instanceof Player) {
 				event.getWhoClicked().closeInventory();
-				requestWaypointId(plugin, (Player) event.getWhoClicked(), waypointItem, priority, range, defaultDiscovered);
+				requestWaypointId(plugin, (Player) event.getWhoClicked(), item, priority, range, defaultDiscovered);
 			}
 		}));
 	}
@@ -268,7 +269,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 						hyphen,
 						Component.text('z').color(secondary),
 						separator,
-						Component.text('_'),
+						Component.text('_').color(secondary),
 						separator,
 						Component.text('0').color(secondary),
 						hyphen,
@@ -410,7 +411,7 @@ public class IndividualWaypointEditor extends SimpleUI {
 						Component.keybind("key.drop"),
 						Component.text(')'))
 				.build());
-		return TextUtil.insertText(waypoint.getIcon().clone(), list);
+		return TextUtil.insertText(new ItemStack(waypoint.getIcon()), list);
 	}
 
 	private static String getName(UUID uuid) {
